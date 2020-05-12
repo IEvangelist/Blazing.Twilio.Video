@@ -1,0 +1,56 @@
+﻿@page "/"
+@inject IJSRuntime JsRuntime
+
+<div class="pt-4">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle"
+                type="button" disabled="@(!HasDevices)" id="cameraButton"
+                data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+            @if (IsLoading)
+            {
+                <span id="loading" class="spinner-border spinner-border-sm"
+                      role="status" aria-hidden="true"></span>
+            }
+            <span>@(IsLoading ? "Loading cameras..." : "Select Camera")</span>
+        </button>
+        <div id="cameras" class="dropdown-menu" aria-labelledby="camera-button">
+            @if (Devices?.Any() ?? false) {
+                foreach (var device in Devices) {
+                    <a href="#" class="dropdown-item" id="@device.DeviceId"
+                       @onclick="@(async () => await SelectCamera(device.DeviceId))">
+                        @device.Label
+                    </a>
+                }
+            }
+        </div>
+    </div>
+    <div id="@CameraContainerId" class="camera"></div>
+</div>
+
+@code {
+    protected enum CameraState {
+        LoadingCameras,
+        FoundCameras,
+        Error
+    }
+
+    protected string CameraContainerId = "camera-container";
+    protected Device[]? Devices { get; set; }
+    protected CameraState State { get; set; }
+    protected bool HasDevices => State == CameraState.FoundCameras;
+    protected bool IsLoading => State == CameraState.LoadingCameras;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
+            State = (Devices?.Any() ?? false)
+                ? CameraState.FoundCameras
+                : CameraState.Error;
+            StateHasChanged();
+        }
+    }
+
+    ValueTask SelectCamera(string deviceId) =>
+        VideoJS.StartVideoAsync(JsRuntime, deviceId, CameraContainerId);
+}
