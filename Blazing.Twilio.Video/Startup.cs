@@ -13,6 +13,7 @@ namespace Blazing.Twilio.Video
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddProtectedBrowserStorage();
             services.Configure<TwilioSettings>(settings =>
             {
                 settings.AccountSid = GetEnvironmentVariable("TWILIO_ACCOUNT_SID");

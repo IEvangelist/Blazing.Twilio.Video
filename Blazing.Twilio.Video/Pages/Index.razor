@@ -12,7 +12,10 @@
                 <span id="loading" class="spinner-border spinner-border-sm"
                       role="status" aria-hidden="true"></span>
             }
-            <span>@(IsLoading ? "Loading cameras..." : "Select Camera")</span>
+            else
+            {
+                <span class="oi oi-video" aria-hidden="true"></span>
+            }
         </button>
         <div id="cameras" class="dropdown-menu" aria-labelledby="camera-button">
             @if (Devices?.Any() ?? false)
