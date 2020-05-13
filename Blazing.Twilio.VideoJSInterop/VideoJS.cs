@@ -6,16 +6,16 @@ namespace Blazing.Twilio.VideoJSInterop
     public class VideoJS
     {
         public static ValueTask<Device[]> GetVideoDevicesAsync(
-            IJSRuntime jsRuntime) =>
-            jsRuntime.InvokeAsync<Device[]>(
-                "videoInterop.getVideoDevices");
+            IJSRuntime? jsRuntime) =>
+            jsRuntime?.InvokeAsync<Device[]>(
+                "videoInterop.getVideoDevices") ?? new ValueTask<Device[]>();
 
         public static ValueTask StartVideoAsync(
-            IJSRuntime jSRuntime,
+            IJSRuntime? jSRuntime,
             string deviceId,
             string containerId) =>
-            jSRuntime.InvokeVoidAsync(
+            jSRuntime?.InvokeVoidAsync(
                 "videoInterop.startVideo",
-                deviceId, containerId);
+                deviceId, containerId) ?? new ValueTask();
     }
 }

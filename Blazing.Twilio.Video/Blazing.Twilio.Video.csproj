@@ -1,9 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Twilio" Version="5.40.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Blazing.Twilio.VideoJSInterop\Blazing.Twilio.VideoJSInterop.csproj" />
