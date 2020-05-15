@@ -1,23 +1,22 @@
 ﻿using Blazing.Twilio.VideoJSInterop;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blazing.Twilio.Video.Pages
 {
     public class IndexPage : ComponentBase
     {
-        [Inject]
-        protected ProtectedLocalStorage LocalStore { get; set; }
+        const string DefaultDeviceId = "default-device-id";
+        protected const string DivId = "cam-1";
+        protected string Selector => $"#{DivId}";
 
-        [Inject]
-        protected IJSRuntime? JsRuntime { get; set; }
+        [Inject] protected ProtectedLocalStorage LocalStore { get; set; } = null!;
+        [Inject] protected IJSRuntime? JsRuntime { get; set; }
 
-        protected const string CameraContainerId = "camera-container";
-        protected const string DefaultDeviceId = "default-device-id";
-
+        protected string Room { get; set; }
         protected Device[]? Devices { get; set; }
         protected CameraState State { get; set; }
         protected bool HasDevices => State == CameraState.FoundCameras;
@@ -28,34 +27,38 @@ namespace Blazing.Twilio.Video.Pages
             if (firstRender && LocalStore != null)
             {
                 Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
-                State = Devices?.Any() ?? false
-                    ? CameraState.FoundCameras
-                    : CameraState.Error;
                 var defaultDeviceId = await LocalStore.GetAsync<string>(DefaultDeviceId);
                 if (!string.IsNullOrWhiteSpace(defaultDeviceId))
                 {
-                    await SelectCamera(defaultDeviceId);
+                    await SelectCamera(defaultDeviceId, false);
+                    StateHasChanged();
                 }
-                
-                StateHasChanged();
             }
         }
 
-        protected async ValueTask SelectCamera(string deviceId)
+        protected async ValueTask SelectCamera(string deviceId, bool persist = true)
         {
-            if (LocalStore != null)
+            if (persist && LocalStore != null)
             {
                 await LocalStore.SetAsync(DefaultDeviceId, deviceId);
             }
 
-            await VideoJS.StartVideoAsync(JsRuntime, deviceId, CameraContainerId);
+            await VideoJS.StartVideoAsync(JsRuntime, deviceId, Selector);
         }
 
-        protected enum CameraState
+        protected async ValueTask TryAddRoom(object args)
         {
-            LoadingCameras,
-            FoundCameras,
-            Error
+            if (string.IsNullOrWhiteSpace(Room))
+            {
+                return;
+            }
+
+            if (args is KeyboardEventArgs keyboard && keyboard.Key == "Enter")
+            {
+                await VideoJS.
+            }
+
+            await new ValueTask();
         }
     }
 }

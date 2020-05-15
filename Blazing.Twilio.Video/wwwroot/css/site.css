@@ -1,45 +1,107 @@
-@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-
-html, body {
+html, body, app {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-a, .btn-link {
-    color: #0366d6;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    margin: auto;
+    background-image: linear-gradient(180deg, rgba(75,12,12,1) 0%, rgba(92,8,8,1) 70%, rgba(255,0,0,1) 100%);
 }
 
 app {
-    position: relative;
-}
-
-.camera > video {
-    height: auto !important;
-    width: 100vh !important;
-    object-fit: cover;
-}
-
-.grid {
     display: grid;
+    grid-template-columns: 1fr 7fr;
+    grid-template-rows: 5fr 3fr;
+    grid-gap: 12px;
     height: 100vh;
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    width: 100vw;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
 }
 
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+.inline {
+    display: flex !important;
+    align-items: center;
 }
 
-.invalid {
-    outline: 1px solid red;
+.center {
+    height: 100%;
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
 }
 
-.validation-message {
-    color: red;
+video {
+    object-fit: contain;
+    width: auto !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    border: 6px solid red;
+    border-top: none;
+    border-bottom: none;
+}
+
+.grid-rooms {
+    grid-row: 1;
+    grid-column: 1;
+    height: auto;
+}
+
+.grid-controls {
+    grid-row: 2;
+    grid-column: 1;
+    height: auto;
+}
+
+.grid-video {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    height: auto;
+    align-content: center
+}
+
+input {
+    font-size: 2em;
+    padding: .5rem 2rem;
+    width: 9em;
+    border-style: none;
+    transition: .5s;
+    transition-timing-function: ease-in-out;
+}
+
+    input:hover:not(:disabled) {
+        cursor: pointer;
+        box-shadow: 0 -6px red;
+        border-style: none;
+    }
+
+    input:focus {
+        outline: none;
+    }
+
+button {
+    background-color: rgba(0,0,0,.7);
+    color: rgba(255,255,255,.7);
+    font-size: 2em;
+    padding: 10px 2rem;
+    border: none;
+    transition: .5s;
+    transition-timing-function: ease-in-out;
+}
+
+    button:hover:not(:disabled) {
+        cursor: pointer;
+        box-shadow: 0 -6px red;
+        background-color: rgba(0,0,0,.9);
+        color: white;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+#add-room {
+    width: 220px;
 }
 
 #blazor-error-ui {
@@ -54,55 +116,9 @@ app {
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
-
-@media (max-width: 767.98px) {
-    .main .top-row:not(.auth) {
-        display: none;
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
     }
-
-    .main .top-row.auth {
-        justify-content: space-between;
-    }
-
-    .main .top-row a, .main .top-row .btn-link {
-        margin-left: 0;
-    }
-}
-
-@media (min-width: 768px) {
-    app {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    .main .top-row {
-        position: sticky;
-        top: 0;
-    }
-
-    .main > div {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
-
-    .navbar-toggler {
-        display: none;
-    }
-
-    .sidebar .collapse {
-        /* Never collapse the sidebar for wide screens */
-        display: block;
-    }
-}

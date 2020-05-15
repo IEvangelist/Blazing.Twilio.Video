@@ -5,6 +5,16 @@ namespace Blazing.Twilio.VideoJSInterop
 {
     public class VideoJS
     {
+         /*
+          * TODO: API surface to include:
+          * 
+          *     Creating or joining a room given a name
+          *     Getting all rooms (display name and id)
+          *     Get auth token from Web API
+          *     SignalR: broadcast new rooms
+          * 
+          */
+
         public static ValueTask<Device[]> GetVideoDevicesAsync(
             IJSRuntime? jsRuntime) =>
             jsRuntime?.InvokeAsync<Device[]>(
@@ -13,9 +23,9 @@ namespace Blazing.Twilio.VideoJSInterop
         public static ValueTask StartVideoAsync(
             IJSRuntime? jSRuntime,
             string deviceId,
-            string containerId) =>
+            string selector) =>
             jSRuntime?.InvokeVoidAsync(
                 "videoInterop.startVideo",
-                deviceId, containerId) ?? new ValueTask();
+                deviceId, selector) ?? new ValueTask();
     }
 }

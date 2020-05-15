@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazing.Twilio.Video", "Blazing.Twilio.Video\Blazing.Twilio.Video.csproj", "{30FD4081-4652-4159-80E1-6EE5E82927CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.Video", "Blazing.Twilio.Video\Blazing.Twilio.Video.csproj", "{30FD4081-4652-4159-80E1-6EE5E82927CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazing.Twilio.VideoJSInterop", "Blazing.Twilio.VideoJSInterop\Blazing.Twilio.VideoJSInterop.csproj", "{17D008D5-5786-462E-9929-7C3E45943A04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.VideoJSInterop", "Blazing.Twilio.VideoJSInterop\Blazing.Twilio.VideoJSInterop.csproj", "{17D008D5-5786-462E-9929-7C3E45943A04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

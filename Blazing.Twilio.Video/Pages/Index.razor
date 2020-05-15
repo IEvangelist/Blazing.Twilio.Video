@@ -1,8 +1,6 @@
 ﻿@page "/"
 @inherits IndexPage
-
-<div class="pt-4">
-    <div class="dropdown">
+@*<div class="dropdown">
         <button class="btn btn-secondary dropdown-toggle"
                 type="button" disabled="@(!HasDevices)" id="cameraButton"
                 data-toggle="dropdown" aria-haspopup="true"
@@ -29,6 +27,21 @@
                 }
             }
         </div>
+    </div>*@
+
+<div class="grid-rooms">
+    <div class="inline">
+        <input @bind="Room" @onkeydown="@(async args => await TryAddRoom(args))" placeholder="Room name" />
+        <button id="add-room" @onclick="@(async args => await TryAddRoom(args))">
+            <i class="far fa-plus-square" aria-label="Create room"></i> Create
+        </button>
     </div>
-    <div id="@CameraContainerId" class="camera"></div>
+</div>
+<div class="grid-controls">
+    <button>
+        <i class="fas fa-video" aria-label="Video settings"></i> Video settings
+    </button>
+</div>
+<div class="grid-video">
+    <div id="@DivId"></div>
 </div>
