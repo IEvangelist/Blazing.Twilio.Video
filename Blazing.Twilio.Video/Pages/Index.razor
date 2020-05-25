@@ -31,10 +31,19 @@
 
 <div class="grid-rooms">
     <div class="inline">
-        <input @bind="Room" @onkeydown="@(async args => await TryAddRoom(args))" placeholder="Room name" />
+        <input @bind="RoomName" @onkeydown="@(async args => await TryAddRoom(args))" placeholder="Room name" />
         <button id="add-room" @onclick="@(async args => await TryAddRoom(args))">
             <i class="far fa-plus-square" aria-label="Create room"></i> Create
         </button>
+        @if (Rooms.Any())
+        {
+            <ul>
+                @foreach (var room in Rooms)
+                {
+                    <li class="@(IsActiveRoom(room) ? "active" : null)">@room</li>
+                }
+            </ul>
+        }
     </div>
 </div>
 <div class="grid-controls">

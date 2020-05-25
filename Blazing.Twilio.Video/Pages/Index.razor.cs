@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Blazing.Twilio.Video.Pages
@@ -15,12 +17,33 @@ namespace Blazing.Twilio.Video.Pages
 
         [Inject] protected ProtectedLocalStorage LocalStore { get; set; } = null!;
         [Inject] protected IJSRuntime? JsRuntime { get; set; }
+        [Inject] protected NavigationManager NavigationManager { get; set; } = null!;
 
-        protected string Room { get; set; }
+        protected List<string> Rooms { get; set; } = new List<string>();
+        protected string? RoomName { get; set; }
         protected Device[]? Devices { get; set; }
         protected CameraState State { get; set; }
         protected bool HasDevices => State == CameraState.FoundCameras;
         protected bool IsLoading => State == CameraState.LoadingCameras;
+
+        HubConnection? _hubConnection;
+        string? _activeRoom;
+
+        protected override async Task OnInitializedAsync()
+        {
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .WithAutomaticReconnect()
+                .Build();
+
+            _hubConnection.On<string>("RoomAdded", room =>
+            {
+                Rooms.Add(room);
+                StateHasChanged();
+            });
+
+            await _hubConnection.StartAsync();
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -48,17 +71,30 @@ namespace Blazing.Twilio.Video.Pages
 
         protected async ValueTask TryAddRoom(object args)
         {
-            if (string.IsNullOrWhiteSpace(Room))
+            if (string.IsNullOrWhiteSpace(RoomName))
             {
                 return;
             }
 
-            if (args is KeyboardEventArgs keyboard && keyboard.Key == "Enter")
+            var takeAction = args switch
             {
-                await VideoJS.
-            }
+                KeyboardEventArgs keyboard when keyboard.Key == "Enter" => true,
+                MouseEventArgs _ => true,
+                _ => false
+            };
 
-            await new ValueTask();
+            if (takeAction)
+            {
+                var addedOrJoined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, RoomName);
+                if (addedOrJoined)
+                {
+                    await _hubConnection.InvokeAsync("RoomAdded", RoomName);
+                    _activeRoom = RoomName;
+                    RoomName = null;
+                }
+            }
         }
+
+        protected bool IsActiveRoom(string room) => _activeRoom == room;
     }
 }

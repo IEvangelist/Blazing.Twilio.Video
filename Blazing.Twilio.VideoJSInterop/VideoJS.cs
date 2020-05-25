@@ -27,5 +27,12 @@ namespace Blazing.Twilio.VideoJSInterop
             jSRuntime?.InvokeVoidAsync(
                 "videoInterop.startVideo",
                 deviceId, selector) ?? new ValueTask();
+
+        public static ValueTask<bool> CreateOrJoinRoomAsync(
+            IJSRuntime? jsRuntime,
+            string roomName) =>
+            jsRuntime?.InvokeAsync<bool>(
+                "videoInterop.createOrJoinRoom",
+                roomName) ?? new ValueTask<bool>(false);
     }
 }

@@ -1,8 +1,9 @@
 const video = Twilio.Video;
 
-let _token = "";
+let _authToken = "";
 let _videoTrack = null;
 let _activeRoom = null;
+let _participants = null;
 
 window.videoInterop = {
     getVideoDevices: async () => {
@@ -50,30 +51,28 @@ window.videoInterop = {
     getAuthToken: async () => {
         const response = await fetch("api/twilio/token");
         if (response.ok) {
-            const json = response.json();
+            const json = await response.json();
             return json.token;
         }
         return null;
     },
-    createOrAddRoom: async (roomName) => {
+    createOrJoinRoom: async (roomName) => {
         try {
             if (_activeRoom) {
                 _activeRoom.disconnect();
             }
 
-            const token = await this.getAuthToken();
+            const token = await videoInterop.getAuthToken();
             _activeRoom = await video.connect(
                 token, {
                 roomName,
-                tracks,
+                _videoTrack,
                 dominantSpeaker: true
             });
         } catch (error) {
             console.error(`Unable to connect to Room: ${error.message}`);
-        } finally {
-            if (_activeRoom) {
-                this.roomBroadcast.next(true);
-            }
         }
+
+        return !!_activeRoom;
     }
 };

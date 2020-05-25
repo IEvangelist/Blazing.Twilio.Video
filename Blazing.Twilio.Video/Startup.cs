@@ -1,8 +1,11 @@
+using Blazing.Twilio.Video.Hubs;
 using Blazing.Twilio.Video.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Linq;
 using static System.Environment;
 
 namespace Blazing.Twilio.Video
@@ -14,6 +17,9 @@ namespace Blazing.Twilio.Video
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddProtectedBrowserStorage();
+            services.AddResponseCompression(opts =>
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" }));
             services.Configure<TwilioSettings>(settings =>
             {
                 settings.AccountSid = GetEnvironmentVariable("TWILIO_ACCOUNT_SID");
@@ -40,6 +46,8 @@ namespace Blazing.Twilio.Video
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notificationHub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
