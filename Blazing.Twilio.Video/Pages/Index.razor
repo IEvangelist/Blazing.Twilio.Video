@@ -1,33 +1,5 @@
 ﻿@page "/"
 @inherits IndexPage
-@*<div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle"
-                type="button" disabled="@(!HasDevices)" id="cameraButton"
-                data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false">
-            @if (IsLoading)
-            {
-                <span id="loading" class="spinner-border spinner-border-sm"
-                      role="status" aria-hidden="true"></span>
-            }
-            else
-            {
-                <span class="oi oi-video" aria-hidden="true"></span>
-            }
-        </button>
-        <div id="cameras" class="dropdown-menu" aria-labelledby="camera-button">
-            @if (Devices?.Any() ?? false)
-            {
-                foreach (var device in Devices)
-                {
-                    <a href="#" class="dropdown-item" id="@device.DeviceId"
-                       @onclick="@(async () => await SelectCamera(device.DeviceId))">
-                        @device.Label
-                    </a>
-                }
-            }
-        </div>
-    </div>*@
 
 <div class="grid-rooms">
     <div class="inline">

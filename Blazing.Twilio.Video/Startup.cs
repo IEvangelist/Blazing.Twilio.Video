@@ -15,6 +15,8 @@ namespace Blazing.Twilio.Video
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddSignalR(options => options.EnableDetailedErrors = true)
+                    .AddMessagePackProtocol();
             services.AddServerSideBlazor();
             services.AddProtectedBrowserStorage();
             services.AddResponseCompression(opts =>
@@ -47,7 +49,7 @@ namespace Blazing.Twilio.Video
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub>("/notificationHub");
+                endpoints.MapHub<NotificationHub>(HubEndpoints.Notifications);
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

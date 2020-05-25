@@ -1,8 +1,11 @@
-﻿using Blazing.Twilio.VideoJSInterop;
+﻿using Blazing.Twilio.Video.Hubs;
+using Blazing.Twilio.VideoJSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,11 +14,12 @@ namespace Blazing.Twilio.Video.Pages
 {
     public class IndexPage : ComponentBase
     {
-        [Inject] protected ProtectedLocalStorage LocalStore { get; set; } = null!;
         [Inject] protected IJSRuntime? JsRuntime { get; set; }
+        [Inject] protected ProtectedLocalStorage LocalStore { get; set; } = null!;
         [Inject] protected NavigationManager NavigationManager { get; set; } = null!;
 
         const string DefaultDeviceId = "default-device-id";
+
         protected const string CameraElementId = "cam-1";
         protected string Selector => $"#{CameraElementId}";
 
@@ -32,8 +36,10 @@ namespace Blazing.Twilio.Video.Pages
         protected override async Task OnInitializedAsync()
         {
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .AddMessagePackProtocol()
+                .WithUrl(NavigationManager.ToAbsoluteUri(HubEndpoints.Notifications))
                 .WithAutomaticReconnect()
+                .ConfigureLogging(builder => builder.AddDebug().AddConsole())
                 .Build();
 
             _hubConnection.On<string>("RoomAdded", async room =>
@@ -47,7 +53,7 @@ namespace Blazing.Twilio.Video.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender && LocalStore != null)
+            if (firstRender)
             {
                 Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
                 var defaultDeviceId = await LocalStore.GetAsync<string>(DefaultDeviceId);
@@ -61,7 +67,7 @@ namespace Blazing.Twilio.Video.Pages
 
         protected async ValueTask SelectCamera(string deviceId, bool persist = true)
         {
-            if (persist && LocalStore != null)
+            if (persist)
             {
                 await LocalStore.SetAsync(DefaultDeviceId, deviceId);
             }
@@ -88,7 +94,7 @@ namespace Blazing.Twilio.Video.Pages
                 var addedOrJoined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, RoomName);
                 if (addedOrJoined)
                 {
-                    await _hubConnection.InvokeAsync("RoomAdded", RoomName);
+                    await _hubConnection.InvokeAsync(HubEndpoints.RoomAdded, RoomName);
                     _activeRoom = RoomName;
                     RoomName = null;
                 }
