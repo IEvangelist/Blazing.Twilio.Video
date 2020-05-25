@@ -35,16 +35,13 @@
         <button id="add-room" @onclick="@(async args => await TryAddRoom(args))">
             <i class="far fa-plus-square" aria-label="Create room"></i> Create
         </button>
-        @if (Rooms.Any())
-        {
-            <ul>
-                @foreach (var room in Rooms)
-                {
-                    <li class="@(IsActiveRoom(room) ? "active" : null)">@room</li>
-                }
-            </ul>
-        }
     </div>
+    <ul>
+    @foreach (var room in Rooms)
+    {
+        <li class="@(IsActiveRoom(room) ? "active" : null)">@room</li>
+    }
+    </ul>
 </div>
 <div class="grid-controls">
     <button>
@@ -52,5 +49,5 @@
     </button>
 </div>
 <div class="grid-video">
-    <div id="@DivId"></div>
+    <div id="@CameraElementId"></div>
 </div>

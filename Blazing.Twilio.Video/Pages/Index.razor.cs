@@ -11,13 +11,13 @@ namespace Blazing.Twilio.Video.Pages
 {
     public class IndexPage : ComponentBase
     {
-        const string DefaultDeviceId = "default-device-id";
-        protected const string DivId = "cam-1";
-        protected string Selector => $"#{DivId}";
-
         [Inject] protected ProtectedLocalStorage LocalStore { get; set; } = null!;
         [Inject] protected IJSRuntime? JsRuntime { get; set; }
         [Inject] protected NavigationManager NavigationManager { get; set; } = null!;
+
+        const string DefaultDeviceId = "default-device-id";
+        protected const string CameraElementId = "cam-1";
+        protected string Selector => $"#{CameraElementId}";
 
         protected List<string> Rooms { get; set; } = new List<string>();
         protected string? RoomName { get; set; }
@@ -36,10 +36,10 @@ namespace Blazing.Twilio.Video.Pages
                 .WithAutomaticReconnect()
                 .Build();
 
-            _hubConnection.On<string>("RoomAdded", room =>
+            _hubConnection.On<string>("RoomAdded", async room =>
             {
                 Rooms.Add(room);
-                StateHasChanged();
+                await InvokeAsync(() => StateHasChanged());
             });
 
             await _hubConnection.StartAsync();
