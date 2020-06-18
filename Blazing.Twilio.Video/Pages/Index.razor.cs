@@ -37,30 +37,43 @@ namespace Blazing.Twilio.Video.Pages
         {
             _hubConnection = new HubConnectionBuilder()
                 .AddMessagePackProtocol()
-                .WithUrl(NavigationManager.ToAbsoluteUri(HubEndpoints.Notifications))
+                .WithUrl(NavigationManager.ToAbsoluteUri(NotificationHub.Endpoint))
                 .WithAutomaticReconnect()
                 .ConfigureLogging(builder => builder.AddDebug().AddConsole())
                 .Build();
 
-            _hubConnection.On<string>("RoomAdded", async room =>
-            {
-                Rooms.Add(room);
-                await InvokeAsync(() => StateHasChanged());
-            });
+            _hubConnection.On<string>(NotificationHub.RoomAddedRoute, OnRoomAdded);
 
             await _hubConnection.StartAsync();
+
+            Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
+            State = Devices != null && Devices.Length > 0
+                    ? CameraState.FoundCameras
+                    : CameraState.Error;
+            StateHasChanged();
         }
+
+        async Task OnRoomAdded(string roomName) =>
+            await InvokeAsync(() =>
+            {
+                Rooms.Add(roomName);
+                StateHasChanged();
+            });
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
                 Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
+                State = Devices != null && Devices.Length > 0
+                        ? CameraState.FoundCameras
+                        : CameraState.Error;
+                StateHasChanged();
+
                 var defaultDeviceId = await LocalStore.GetAsync<string>(DefaultDeviceId);
                 if (!string.IsNullOrWhiteSpace(defaultDeviceId))
                 {
                     await SelectCamera(defaultDeviceId, false);
-                    StateHasChanged();
                 }
             }
         }
@@ -94,10 +107,25 @@ namespace Blazing.Twilio.Video.Pages
                 var addedOrJoined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, RoomName);
                 if (addedOrJoined)
                 {
-                    await _hubConnection.InvokeAsync(HubEndpoints.RoomAdded, RoomName);
                     _activeRoom = RoomName;
                     RoomName = null;
+
+                    await _hubConnection.InvokeAsync(NotificationHub.RoomAddedRoute, _activeRoom);
                 }
+            }
+        }
+
+        protected async ValueTask TryJoinRoom(string roomName)
+        {
+            if (string.IsNullOrWhiteSpace(roomName))
+            {
+                return;
+            }
+
+            var joined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, roomName);
+            if (joined)
+            {
+                _activeRoom = roomName;
             }
         }
 

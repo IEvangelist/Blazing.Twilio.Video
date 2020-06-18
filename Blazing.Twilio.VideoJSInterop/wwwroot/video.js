@@ -40,8 +40,7 @@ window.videoInterop = {
                 _videoTrack.detach().forEach(element => element.remove());
             }
 
-            const tracks = await video.createLocalTracks({ audio: true, video: { deviceId } });
-            _videoTrack = tracks.find(t => t.kind === 'video');
+            _videoTrack = await video.createLocalVideoTrack({ deviceId });
             const videoEl = _videoTrack.attach();
             cameraContainer.append(videoEl);
         } catch (error) {
@@ -63,10 +62,12 @@ window.videoInterop = {
             }
 
             const token = await videoInterop.getAuthToken();
+            const audioTrack = await video.createLocalAudioTrack();
+            const tracks = [audioTrack, _videoTrack];
             _activeRoom = await video.connect(
                 token, {
                 roomName,
-                _videoTrack,
+                tracks,
                 dominantSpeaker: true
             });
         } catch (error) {

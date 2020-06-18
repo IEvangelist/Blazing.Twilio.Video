@@ -5,14 +5,11 @@ namespace Blazing.Twilio.Video.Hubs
 {
     public class NotificationHub : Hub
     {
+        internal const string Endpoint = "/notificationHub";
+
+        internal const string RoomAddedRoute = nameof(RoomAdded);
+
         public Task RoomAdded(string room) =>
-            Clients.Others.SendAsync(HubEndpoints.RoomAdded, room);
-    }
-
-    static class HubEndpoints
-    {
-        internal const string Notifications = "/notificationHub";
-
-        internal const string RoomAdded = nameof(NotificationHub.RoomAdded);
+            Clients.All.SendAsync(RoomAddedRoute, room);
     }
 }

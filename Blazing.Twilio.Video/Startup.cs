@@ -49,7 +49,7 @@ namespace Blazing.Twilio.Video
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub>(HubEndpoints.Notifications);
+                endpoints.MapHub<NotificationHub>(NotificationHub.Endpoint);
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

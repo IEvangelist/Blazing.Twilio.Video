@@ -5,15 +5,8 @@ html, body, app {
 }
 
 app {
-    display: grid;
-    grid-template-columns: 1fr 7fr;
-    grid-template-rows: 5fr 3fr;
-    grid-gap: 12px;
     height: 100vh;
     width: 100vw;
-    align-items: center;
-    text-align: center;
-    overflow: hidden;
 }
 
 .inline {
