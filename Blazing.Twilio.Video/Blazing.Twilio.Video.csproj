@@ -12,8 +12,4 @@
     <PackageReference Include="Twilio" Version="5.43.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Blazing.Twilio.VideoJSInterop\Blazing.Twilio.VideoJSInterop.csproj" />
-  </ItemGroup>
-
 </Project>
