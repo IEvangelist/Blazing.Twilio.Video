@@ -6,7 +6,7 @@ namespace Blazing.Twilio.WasmVideo.Server.Hubs
 {
     public class NotificationHub : Hub
     {
-        public Task RoomAdded(string room) =>
-            Clients.All.SendAsync(HubEndpoints.RoomAdded, room);
+        public Task RoomsUpdated(string room) =>
+            Clients.All.SendAsync(HubEndpoints.RoomsUpdated, room);
     }
 }

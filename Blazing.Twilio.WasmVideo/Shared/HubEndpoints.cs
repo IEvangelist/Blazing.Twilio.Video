@@ -3,6 +3,6 @@
     public class HubEndpoints
     {
         public const string NotificationHub = "/notifications";
-        public const string RoomAdded = nameof(RoomAdded);
+        public const string RoomsUpdated = nameof(RoomsUpdated);
     }
 }

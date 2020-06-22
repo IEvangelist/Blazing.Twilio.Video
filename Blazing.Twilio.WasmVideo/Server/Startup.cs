@@ -1,5 +1,6 @@
 using Blazing.Twilio.WasmVideo.Server.Hubs;
 using Blazing.Twilio.WasmVideo.Server.Options;
+using Blazing.Twilio.WasmVideo.Server.Services;
 using Blazing.Twilio.WasmVideo.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +29,7 @@ namespace Blazing.Twilio.WasmVideo.Server
                 settings.ApiSecret = GetEnvironmentVariable("TWILIO_API_SECRET");
                 settings.ApiKey = GetEnvironmentVariable("TWILIO_API_KEY");
             });
+            services.AddSingleton<ITwilioService, TwilioService>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddResponseCompression(opts =>

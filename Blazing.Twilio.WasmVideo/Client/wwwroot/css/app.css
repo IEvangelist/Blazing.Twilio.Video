@@ -1,4 +1,35 @@
-﻿app {
+﻿/** https://www.twilio.com/company/brand */
+:root {
+    --twilio-red: #F22F46;
+    --twilio-blue: #0D122B;
+}
+
+.twilio-text {
+    color: var(--twilio-red);
+}
+
+a.list-group-item.list-group-item-action.active {
+    background-color: var(--twilio-red);
+    border-color: var(--twilio-red);
+}
+
+.twilio-btn-red {
+    background-color: var(--twilio-red);
+}
+
+    .twilio-btn-red:not(:disabled):hover {
+        background-color: #D31027
+    }
+
+.twilio-btn-blue {
+    background-color: var(--twilio-blue);
+}
+
+    .twilio-btn-blue:not(:disabled):hover {
+        background-color: #00000C;
+    }
+
+app {
     position: relative;
     display: flex;
     flex-direction: column;

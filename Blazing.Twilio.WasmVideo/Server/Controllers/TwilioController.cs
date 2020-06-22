@@ -1,10 +1,6 @@
-﻿using Blazing.Twilio.WasmVideo.Server.Options;
-using Blazing.Twilio.WasmVideo.Shared;
+﻿using Blazing.Twilio.WasmVideo.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using Twilio.Jwt.AccessToken;
+using System.Threading.Tasks;
 
 namespace Blazing.Twilio.WasmVideo.Server.Controllers
 {
@@ -14,22 +10,14 @@ namespace Blazing.Twilio.WasmVideo.Server.Controllers
     ]
     public class TwilioController : ControllerBase
     {
-        readonly TwilioSettings _twilioSettings;
-
-        public TwilioController(IOptions<TwilioSettings> twilioOptions) =>
-            _twilioSettings = twilioOptions?.Value ?? throw new ArgumentException(nameof(twilioOptions));
-
         [HttpGet("token")]
-        public IActionResult GetToken() =>
-             new JsonResult(new TwilioJwt
-             {
-                 Token = new Token(
-                         _twilioSettings.AccountSid,
-                         _twilioSettings.ApiKey,
-                         _twilioSettings.ApiSecret,
-                         User.Identity.Name ?? Guid.NewGuid().ToString(),
-                         grants: new HashSet<IGrant> { new VideoGrant() })
-                     .ToJwt()
-             });
+        public IActionResult GetToken(
+            [FromServices] ITwilioService twilioService) =>
+             new JsonResult(twilioService.GetTwilioJwt(User.Identity.Name));
+
+        [HttpGet("rooms")]
+        public async Task<IActionResult> GetRooms(
+            [FromServices] ITwilioService twilioService)
+            => new JsonResult(await twilioService.GetAllRoomsAsync());
     }
 }

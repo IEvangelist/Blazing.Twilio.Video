@@ -56,7 +56,7 @@ window.videoInterop = {
             const tracks = [audioTrack, _videoTrack];
             _activeRoom = await video.connect(
                 token, {
-                roomName,
+                name: roomName,
                 tracks,
                 dominantSpeaker: true
             });

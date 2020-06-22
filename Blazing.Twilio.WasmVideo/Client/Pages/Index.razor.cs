@@ -24,15 +24,16 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
         protected const string CameraElementId = "cam-1";
         protected string Selector => $"#{CameraElementId}";
 
-        protected List<string> Rooms { get; set; } = new List<string>();
+        protected List<RoomDetails> Rooms { get; set; } = new List<RoomDetails>();
         protected string? RoomName { get; set; }
         protected Device[]? Devices { get; set; }
         protected CameraState State { get; set; }
         protected bool HasDevices => State == CameraState.FoundCameras;
         protected bool IsLoading => State == CameraState.LoadingCameras;
+        protected string? ActiveCamera { get; set; }
+        protected string? ActiveRoom { get; set; }
 
         HubConnection? _hubConnection;
-        string? _activeRoom;
 
         protected override async Task OnInitializedAsync()
         {
@@ -42,7 +43,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
                 .WithAutomaticReconnect()
                 .Build();
 
-            _hubConnection.On<string>(HubEndpoints.RoomAdded, OnRoomAdded);
+            _hubConnection.On<string>(HubEndpoints.RoomsUpdated, OnRoomAdded);
 
             await _hubConnection.StartAsync();
 
@@ -50,19 +51,20 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
             State = Devices != null && Devices.Length > 0
                     ? CameraState.FoundCameras
                     : CameraState.Error;
-
-            StateHasChanged();
         }
 
         async Task OnRoomAdded(string roomName) =>
-            await InvokeAsync(() =>
+            await InvokeAsync(async () =>
             {
-                Rooms.Add(roomName);
+                Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
                 StateHasChanged();
             });
 
-        protected async ValueTask SelectCamera(string deviceId) =>
+        protected async ValueTask SelectCamera(string deviceId)
+        {
             await VideoJS.StartVideoAsync(JsRuntime, deviceId, Selector);
+            ActiveCamera = deviceId;
+        }
 
         protected async ValueTask TryAddRoom(object args)
         {
@@ -80,43 +82,35 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
 
             if (takeAction)
             {
-                var jwt = await Http.GetFromJsonAsync<TwilioJwt>("api/twilio/token");
-                if (jwt?.Token is null)
-                {
-                    return;
-                }
-
-                var addedOrJoined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, RoomName, jwt.Token);
+                var addedOrJoined = await TryJoinRoom(RoomName);
                 if (addedOrJoined)
                 {
-                    _activeRoom = RoomName;
                     RoomName = null;
-
-                    await _hubConnection.InvokeAsync(HubEndpoints.RoomAdded, _activeRoom);
                 }
             }
         }
 
-        protected async ValueTask TryJoinRoom(string roomName)
+        protected async ValueTask<bool> TryJoinRoom(string? roomName)
         {
             if (string.IsNullOrWhiteSpace(roomName))
             {
-                return;
+                return false;
             }
 
             var jwt = await Http.GetFromJsonAsync<TwilioJwt>("api/twilio/token");
             if (jwt?.Token is null)
             {
-                return;
+                return false;
             }
 
             var joined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, roomName, jwt.Token);
             if (joined)
             {
-                _activeRoom = roomName;
+                ActiveRoom = roomName;
+                await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, ActiveRoom);
             }
-        }
 
-        protected bool IsActiveRoom(string room) => _activeRoom == room;
+            return joined;
+        }
     }
 }
