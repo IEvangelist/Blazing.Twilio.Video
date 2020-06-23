@@ -4,10 +4,12 @@ using Blazing.Twilio.WasmVideo.Server.Services;
 using Blazing.Twilio.WasmVideo.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using System.Linq;
 using static System.Environment;
 
@@ -54,10 +56,14 @@ namespace Blazing.Twilio.WasmVideo.Server
 
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
-            app.UseStaticFiles();
-
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                HttpsCompression = HttpsCompressionMode.Compress,
+                OnPrepareResponse = context =>
+                    context.Context.Response.Headers[HeaderNames.CacheControl] =
+                        $"public,max-age={86_400}"
+            });
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();

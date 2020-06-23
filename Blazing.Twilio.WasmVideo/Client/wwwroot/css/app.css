@@ -9,24 +9,30 @@
 }
 
 a.list-group-item.list-group-item-action.active {
-    background-color: var(--twilio-red);
-    border-color: var(--twilio-red);
+    background-color: var(--twilio-blue);
+    border-color: var(--twilio-blue);
 }
 
 .twilio-btn-red {
     background-color: var(--twilio-red);
+    border-color: var(--twilio-red);
+    color: #fff;
 }
 
     .twilio-btn-red:not(:disabled):hover {
-        background-color: #D31027
+        background-color: #D31027;
+        border-color: #D31027;
     }
 
 .twilio-btn-blue {
     background-color: var(--twilio-blue);
+    border-color: var(--twilio-blue);
+    color: #fff;
 }
 
     .twilio-btn-blue:not(:disabled):hover {
         background-color: #00000C;
+        border-color: #00000C;
     }
 
 app {

@@ -57,7 +57,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
             await InvokeAsync(async () =>
             {
                 Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
-                StateHasChanged();
+                // StateHasChanged();
             });
 
         protected async ValueTask SelectCamera(string deviceId)

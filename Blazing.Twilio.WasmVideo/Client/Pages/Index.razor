@@ -34,10 +34,11 @@
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <div class="input-group">
                         <input type="text" class="form-control form-control-lg"
-                               placeholder="Room name" aria-label="Room Name"
+                               placeholder="Room name" aria-label="Room Name" disabled="@(ActiveCamera is null)"
                                @bind="RoomName" @onkeydown="@(async args => await TryAddRoom(args))" />
                         <div class="input-group-append">
                             <button class="btn btn-lg btn-outline-secondary twilio-btn-red"
+                                     disabled="@(ActiveCamera is null)"
                                     @onclick="@(async args => await TryAddRoom(args))">
                                 <i class="far fa-plus-square" aria-label="Create room"></i> Create
                             </button>
@@ -47,7 +48,7 @@
                 @if (!(Rooms?.Any() ?? false))
                 {
                     <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <p class="lead">
+                        <p class="lead mb-0">
                             Add a room to begin. Other online participants can join or create rooms.
                         </p>
                     </div>
