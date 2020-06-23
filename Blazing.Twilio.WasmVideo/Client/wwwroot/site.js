@@ -6,11 +6,13 @@ let _participants = null;
 
 async function getVideoDevices() {
     try {
-        await navigator.mediaDevices.getUserMedia({
-            video: true
-        });
-
         let devices = await navigator.mediaDevices.enumerateDevices();
+        if (devices && devices.length === 0) {
+            await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
+        }
+
         if (devices && devices.length) {
             const deviceResults = [];
             devices.filter(device => device.kind === "videoinput")
@@ -119,14 +121,14 @@ function registerParticipantEvents(participant) {
 }
 
 function subscribe(publication) {
-    if (publication && publication.on) {
+    if (isMemberDefined(publication, 'on')) {
         publication.on('subscribed', track => attachTrack(track));
         publication.on('unsubscribed', track => detachTrack(track));
     }
 }
 
 function attachTrack(track) {
-    if (this.isAttachable(track)) {
+    if (isMemberDefined(track, 'attach')) {
         const element = track.attach();
         this.renderer.data.id = track.sid;
         this.renderer.appendChild(this.listRef.nativeElement, element);
@@ -135,18 +137,14 @@ function attachTrack(track) {
 }
 
 function detachTrack(track) {
-    if (this.isDetachable(track)) {
+    if (this.isMemberDefined(track, 'detach')) {
         track.detach().forEach(el => el.remove());
         //_participantsChanged.emit(true);
     }
 }
 
-function isAttachable(track) {
-    return !!track && track.attach !== undefined;
-}
-
-function isDetachable(track) {
-    return !!track && track.detach !== undefined;
+function isMemberDefined(instance, member) {
+    return !!instance && instance[member] !== undefined;
 }
 
 window.videoInterop = {
