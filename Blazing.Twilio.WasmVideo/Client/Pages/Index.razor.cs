@@ -24,19 +24,25 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
         protected const string CameraElementId = "cam-1";
         protected string Selector => $"#{CameraElementId}";
 
-        protected List<RoomDetails> Rooms { get; set; } = new List<RoomDetails>();
+        protected List<RoomDetails> Rooms { get; private set; } = new List<RoomDetails>();
         protected string? RoomName { get; set; }
-        protected Device[]? Devices { get; set; }
-        protected CameraState State { get; set; }
+        protected Device[]? Devices { get; private set; }
+        protected CameraState State { get; private set; }
         protected bool HasDevices => State == CameraState.FoundCameras;
         protected bool IsLoading => State == CameraState.LoadingCameras;
-        protected string? ActiveCamera { get; set; }
-        protected string? ActiveRoom { get; set; }
+        protected string? ActiveCamera { get; private set; }
+        protected string? ActiveRoom { get; private set; }
 
         HubConnection? _hubConnection;
 
         protected override async Task OnInitializedAsync()
         {
+            Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
+            Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
+            State = Devices != null && Devices.Length > 0
+                    ? CameraState.FoundCameras
+                    : CameraState.Error;
+
             _hubConnection = new HubConnectionBuilder()
                 .AddMessagePackProtocol()
                 .WithUrl(NavigationManager.ToAbsoluteUri(HubEndpoints.NotificationHub))
@@ -46,18 +52,13 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
             _hubConnection.On<string>(HubEndpoints.RoomsUpdated, OnRoomAdded);
 
             await _hubConnection.StartAsync();
-
-            Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
-            State = Devices != null && Devices.Length > 0
-                    ? CameraState.FoundCameras
-                    : CameraState.Error;
         }
 
         async Task OnRoomAdded(string roomName) =>
             await InvokeAsync(async () =>
             {
                 Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
-                // StateHasChanged();
+                StateHasChanged();
             });
 
         protected async ValueTask SelectCamera(string deviceId)

@@ -35,6 +35,38 @@ a.list-group-item.list-group-item-action.active {
         border-color: #00000C;
     }
 
+input:disabled, .btn:disabled {
+    border-color: #444;
+    cursor: not-allowed;
+}
+
+.participants-grid {
+    display: grid;
+    grid-gap: 5px;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+}
+
+    .participants-grid > div:nth-of-type(1) {
+        grid-row: 1;
+        grid-column: 1;
+    }
+
+    .participants-grid > div:nth-of-type(2) {
+        grid-row: 1;
+        grid-column: 2;
+    }
+
+    .participants-grid > div:nth-of-type(3) {
+        grid-row: 2;
+        grid-column: 1;
+    }
+
+    .participants-grid > div:nth-of-type(4) {
+        grid-row: 2;
+        grid-column: 2;
+    }
+
 app {
     position: relative;
     display: flex;
@@ -74,12 +106,12 @@ app {
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
 
 @media (min-width: 768px) {
     app {

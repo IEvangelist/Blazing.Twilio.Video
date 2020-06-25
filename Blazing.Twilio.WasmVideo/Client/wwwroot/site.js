@@ -2,7 +2,8 @@
 
 let _videoTrack = null;
 let _activeRoom = null;
-let _participants = null;
+let _participants = new Map();
+let _dominantSpeaker = null;
 
 async function getVideoDevices() {
     try {
@@ -13,9 +14,10 @@ async function getVideoDevices() {
             });
         }
 
+        devices = await navigator.mediaDevices.enumerateDevices();
         if (devices && devices.length) {
             const deviceResults = [];
-            devices.filter(device => device.kind === "videoinput")
+            devices.filter(device => device.kind === 'videoinput')
                 .forEach(device => {
                     const { deviceId, label } = device;
                     deviceResults.push({ deviceId, label });
@@ -68,13 +70,11 @@ async function createOrJoinRoom(roomName, token) {
             initialize(_activeRoom.participants);
             _activeRoom
                 .on('disconnected',
-                    room => room.localParticipant.tracks.forEach(publication => detachTrack(publication.track)))
-                .on('participantConnected',
-                    participant => this.participants.add(participant))
-                .on('participantDisconnected',
-                    participant => this.participants.remove(participant))
-                .on('dominantSpeakerChanged',
-                    dominantSpeaker => this.participants.loudest(dominantSpeaker));
+                    room => room.localParticipant.tracks.forEach(
+                        publication => detachTrack(publication.track)))
+                .on('participantConnected', participant => add(participant))
+                .on('participantDisconnected', participant => remove(participant))
+                .on('dominantSpeakerChanged', dominantSpeaker => loudest(dominantSpeaker));
         }
     } catch (error) {
         console.error(`Unable to connect to Room: ${error.message}`);
@@ -104,7 +104,7 @@ function remove(participant) {
 }
 
 function loudest(participant) {
-    this.dominantSpeaker = participant;
+    _dominantSpeaker = participant;
 }
 
 function registerParticipantEvents(participant) {
@@ -129,9 +129,26 @@ function subscribe(publication) {
 
 function attachTrack(track) {
     if (isMemberDefined(track, 'attach')) {
-        const element = track.attach();
-        this.renderer.data.id = track.sid;
-        this.renderer.appendChild(this.listRef.nativeElement, element);
+        const audioOrVideo = track.attach();
+        audioOrVideo.id = track.sid;
+
+        if ('VIDEO' === audioOrVideo.tagName.toUpperCase()) {
+            const responsiveDiv = document.createElement('div');
+            responsiveDiv.id = track.sid;
+            responsiveDiv.classList.add('embed-responsive');
+            responsiveDiv.classList.add('embed-responsive-16by9');
+
+            const responsiveItem = document.createElement('div');
+            responsiveItem.classList.add('embed-responsive-item');
+
+            responsiveItem.appendChild(audioOrVideo);
+            responsiveDiv.appendChild(responsiveItem);
+            document.getElementById('participants').appendChild(responsiveDiv);
+        } else {
+            document.getElementById('participants')
+                    .appendChild(audioOrVideo);
+        }
+
         //_participantsChanged.emit(true);
     }
 }
