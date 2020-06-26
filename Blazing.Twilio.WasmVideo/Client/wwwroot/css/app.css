@@ -40,6 +40,10 @@ input:disabled, .btn:disabled {
     cursor: not-allowed;
 }
 
+audio {
+    display: none;
+}
+
 .participants-grid {
     display: grid;
     grid-gap: 5px;
