@@ -9,20 +9,21 @@ namespace Blazing.Twilio.WasmVideo.Client.Components
     public partial class Cameras
     {
         [Inject]
-        protected IJSRuntime? JsRuntime { get; set; }
+        protected IJSRuntime? JavaScript { get; set; }
+
+        [Parameter]
+        public EventCallback<string> CameraChanged { get; set; }
+
         protected Device[]? Devices { get; private set; }
         protected CameraState State { get; private set; }
         protected bool HasDevices => State == CameraState.FoundCameras;
         protected bool IsLoading => State == CameraState.LoadingCameras;
 
-        [Parameter]
-        public EventCallback<string> CameraChanged { get; set; }
-
         string? _activeCamera;
 
         protected override async Task OnInitializedAsync()
         {
-            Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
+            Devices = await VideoJS.GetVideoDevicesAsync(JavaScript);
             State = Devices != null && Devices.Length > 0
                     ? CameraState.FoundCameras
                     : CameraState.Error;
@@ -30,7 +31,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Components
 
         protected async ValueTask SelectCamera(string deviceId)
         {
-            await VideoJS.StartVideoAsync(JsRuntime, deviceId, "#camera");
+            await VideoJS.StartVideoAsync(JavaScript, deviceId, "#camera");
             _activeCamera = deviceId;
 
             if (CameraChanged.HasDelegate)

@@ -15,17 +15,17 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
     public partial class Index
     {
         [Inject] 
-        protected IJSRuntime? JsRuntime { get; set; }
+        protected IJSRuntime? JavaScript { get; set; }
         [Inject] 
         protected NavigationManager NavigationManager { get; set; } = null!;
         [Inject]
         protected HttpClient Http { get; set; } = null!;
 
         protected List<RoomDetails> Rooms { get; private set; } = new List<RoomDetails>();
-        protected string? RoomName { get; set; }
-        protected string? ActiveCamera { get; private set; }
-        protected string? ActiveRoom { get; private set; }
 
+        string? _roomName;
+        string? _activeCamera;
+        string? _activeRoom;
         HubConnection? _hubConnection;
 
         protected override async Task OnInitializedAsync()
@@ -43,8 +43,10 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
             await _hubConnection.StartAsync();
         }
 
+        ValueTask OnLeaveRoom() => VideoJS.LeaveRoomAsync(JavaScript);
+
         async Task OnCameraChanged(string activeCamera) => 
-            await InvokeAsync(() => ActiveCamera = activeCamera);
+            await InvokeAsync(() => _activeCamera = activeCamera);
 
         async Task OnRoomAdded(string roomName) =>
             await InvokeAsync(async () =>
@@ -55,7 +57,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
 
         protected async ValueTask TryAddRoom(object args)
         {
-            if (string.IsNullOrWhiteSpace(RoomName))
+            if (string.IsNullOrWhiteSpace(_roomName))
             {
                 return;
             }
@@ -69,10 +71,10 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
 
             if (takeAction)
             {
-                var addedOrJoined = await TryJoinRoom(RoomName);
+                var addedOrJoined = await TryJoinRoom(_roomName);
                 if (addedOrJoined)
                 {
-                    RoomName = null;
+                    _roomName = null;
                 }
             }
         }
@@ -90,11 +92,11 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
                 return false;
             }
 
-            var joined = await VideoJS.CreateOrJoinRoomAsync(JsRuntime, roomName, jwt.Token);
+            var joined = await VideoJS.CreateOrJoinRoomAsync(JavaScript, roomName, jwt.Token);
             if (joined)
             {
-                ActiveRoom = roomName;
-                await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, ActiveRoom);
+                _activeRoom = roomName;
+                await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom);
             }
 
             return joined;

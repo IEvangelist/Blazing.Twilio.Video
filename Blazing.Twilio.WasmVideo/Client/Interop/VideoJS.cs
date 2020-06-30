@@ -26,5 +26,10 @@ namespace Blazing.Twilio.WasmVideo.Client.Interop
             jsRuntime?.InvokeAsync<bool>(
                 "videoInterop.createOrJoinRoom",
                 roomName, token) ?? new ValueTask<bool>(false);
+
+        public static ValueTask LeaveRoomAsync(
+            IJSRuntime? jsRuntime) =>
+            jsRuntime?.InvokeVoidAsync(
+                "videoInterop.leaveRoom") ?? new ValueTask();
     }
 }

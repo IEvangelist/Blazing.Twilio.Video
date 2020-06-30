@@ -148,15 +148,14 @@ function attachTrack(track) {
             document.getElementById('participants')
                     .appendChild(audioOrVideo);
         }
-
-        //_participantsChanged.emit(true);
     }
 }
 
 function detachTrack(track) {
     if (this.isMemberDefined(track, 'detach')) {
+
+        // TODO: clean this up to also remove, placeholder parent divs...
         track.detach().forEach(el => el.remove());
-        //_participantsChanged.emit(true);
     }
 }
 
@@ -164,8 +163,25 @@ function isMemberDefined(instance, member) {
     return !!instance && instance[member] !== undefined;
 }
 
+function leaveRoom() {
+    try {
+        if (_activeRoom) {
+            _activeRoom.disconnect();
+            _activeRoom = null;
+        }
+
+        if (_participants) {
+            _participants.clear();
+        }
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+
 window.videoInterop = {
     getVideoDevices,
     startVideo,
-    createOrJoinRoom
+    createOrJoinRoom,
+    leaveRoom
 };
