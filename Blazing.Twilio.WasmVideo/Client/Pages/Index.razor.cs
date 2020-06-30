@@ -21,15 +21,8 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
         [Inject]
         protected HttpClient Http { get; set; } = null!;
 
-        protected const string CameraElementId = "cam-1";
-        protected string Selector => $"#{CameraElementId}";
-
         protected List<RoomDetails> Rooms { get; private set; } = new List<RoomDetails>();
         protected string? RoomName { get; set; }
-        protected Device[]? Devices { get; private set; }
-        protected CameraState State { get; private set; }
-        protected bool HasDevices => State == CameraState.FoundCameras;
-        protected bool IsLoading => State == CameraState.LoadingCameras;
         protected string? ActiveCamera { get; private set; }
         protected string? ActiveRoom { get; private set; }
 
@@ -38,10 +31,6 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
-            Devices = await VideoJS.GetVideoDevicesAsync(JsRuntime);
-            State = Devices != null && Devices.Length > 0
-                    ? CameraState.FoundCameras
-                    : CameraState.Error;
 
             _hubConnection = new HubConnectionBuilder()
                 .AddMessagePackProtocol()
@@ -54,18 +43,15 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
             await _hubConnection.StartAsync();
         }
 
+        async Task OnCameraChanged(string activeCamera) => 
+            await InvokeAsync(() => ActiveCamera = activeCamera);
+
         async Task OnRoomAdded(string roomName) =>
             await InvokeAsync(async () =>
             {
                 Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
                 StateHasChanged();
             });
-
-        protected async ValueTask SelectCamera(string deviceId)
-        {
-            await VideoJS.StartVideoAsync(JsRuntime, deviceId, Selector);
-            ActiveCamera = deviceId;
-        }
 
         protected async ValueTask TryAddRoom(object args)
         {

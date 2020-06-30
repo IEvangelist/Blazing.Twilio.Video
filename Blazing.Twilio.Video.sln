@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Server", "Blazing.Twilio.WasmVideo\Server\Blazing.Twilio.WasmVideo.Server.csproj", "{290FA210-E7E8-4BAA-A1C7-5AE2A72A8387}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazing.Twilio.WasmVideo.Client", "Blazing.Twilio.WasmVideo\Client\Blazing.Twilio.WasmVideo.Client.csproj", "{64A59EC6-A8EB-4CA5-8A1A-5D977F0EF3F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Client", "Blazing.Twilio.WasmVideo\Client\Blazing.Twilio.WasmVideo.Client.csproj", "{64A59EC6-A8EB-4CA5-8A1A-5D977F0EF3F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Shared", "Blazing.Twilio.WasmVideo\Shared\Blazing.Twilio.WasmVideo.Shared.csproj", "{CC370A73-7D66-4751-B25D-95DAC3667727}"
 EndProject

@@ -1,0 +1,26 @@
+﻿<h5><i class="fas fa-cog"></i> Settings</h5>
+<div class="dropdown pb-4">
+    <button class="btn btn-lg btn-secondary dropdown-toggle twilio-btn-red w-100"
+            type="button" id="dropdownMenuButton"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span>@(IsLoading ? "Loading cameras..." : "Select Camera")</span>
+        @if (IsLoading)
+        {
+            <span id="loading" class="spinner-border spinner-border-sm"
+                  role="status" aria-hidden="true"></span>
+        }
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        @if (HasDevices)
+        {
+            foreach (var device in Devices!)
+            {
+                <a href="#" class="dropdown-item @(_activeCamera == device.DeviceId ? "active" : "")"
+                   id="@device.DeviceId"
+                   @onclick="@(async () => await SelectCamera(device.DeviceId))">
+                    @device.Label
+                </a>
+            }
+        }
+    </div>
+</div>
