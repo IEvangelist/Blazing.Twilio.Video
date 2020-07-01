@@ -14,7 +14,7 @@
                                @bind="_roomName" @onkeydown="@(async args => await TryAddRoom(args))" />
                         <div class="input-group-append">
                             <button class="btn btn-lg twilio-btn-red"
-                                    disabled="@(_activeCamera is null)"
+                                    disabled="@(_activeCamera is null || _roomName is null)"
                                     @onclick="@(async args => await TryAddRoom(args))">
                                 <i class="far fa-plus-square" aria-label="Create room"></i> Create
                             </button>

@@ -43,7 +43,15 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
             await _hubConnection.StartAsync();
         }
 
-        ValueTask OnLeaveRoom() => VideoJS.LeaveRoomAsync(JavaScript);
+        async ValueTask OnLeaveRoom()
+        {
+            await VideoJS.LeaveRoomAsync(JavaScript);
+            await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom = null);
+            if (!string.IsNullOrWhiteSpace(_activeCamera))
+            {
+                await VideoJS.StartVideoAsync(JavaScript, _activeCamera, "#camera");
+            }
+        }
 
         async Task OnCameraChanged(string activeCamera) => 
             await InvokeAsync(() => _activeCamera = activeCamera);

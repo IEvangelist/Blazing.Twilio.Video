@@ -1,6 +1,4 @@
-﻿const video = Twilio.Video;
-
-let _videoTrack = null;
+﻿let _videoTrack = null;
 let _activeRoom = null;
 let _participants = new Map();
 let _dominantSpeaker = null;
@@ -43,7 +41,7 @@ async function startVideo(deviceId, selector) {
             _videoTrack.detach().forEach(element => element.remove());
         }
 
-        _videoTrack = await video.createLocalVideoTrack({ deviceId });
+        _videoTrack = await Twilio.Video.createLocalVideoTrack({ deviceId });
         const videoEl = _videoTrack.attach();
         cameraContainer.append(videoEl);
     } catch (error) {
@@ -57,9 +55,9 @@ async function createOrJoinRoom(roomName, token) {
             _activeRoom.disconnect();
         }
 
-        const audioTrack = await video.createLocalAudioTrack();
+        const audioTrack = await Twilio.Video.createLocalAudioTrack();
         const tracks = [audioTrack, _videoTrack];
-        _activeRoom = await video.connect(
+        _activeRoom = await Twilio.Video.connect(
             token, {
             name: roomName,
             tracks,
@@ -132,7 +130,7 @@ function attachTrack(track) {
         const audioOrVideo = track.attach();
         audioOrVideo.id = track.sid;
 
-        if ('VIDEO' === audioOrVideo.tagName.toUpperCase()) {
+        if ('video' === audioOrVideo.tagName.toLowerCase()) {
             const responsiveDiv = document.createElement('div');
             responsiveDiv.id = track.sid;
             responsiveDiv.classList.add('embed-responsive');
@@ -141,21 +139,38 @@ function attachTrack(track) {
             const responsiveItem = document.createElement('div');
             responsiveItem.classList.add('embed-responsive-item');
 
+            // Similar to.
+            // <div class="embed-responsive embed-responsive-16by9">
+            //   <div id="camera" class="embed-responsive-item">
+            //     <video></video>
+            //   </div>
+            // </div>
             responsiveItem.appendChild(audioOrVideo);
             responsiveDiv.appendChild(responsiveItem);
             document.getElementById('participants').appendChild(responsiveDiv);
         } else {
             document.getElementById('participants')
-                    .appendChild(audioOrVideo);
+                .appendChild(audioOrVideo);
         }
     }
 }
 
 function detachTrack(track) {
     if (this.isMemberDefined(track, 'detach')) {
-
-        // TODO: clean this up to also remove, placeholder parent divs...
-        track.detach().forEach(el => el.remove());
+        track.detach()
+            .forEach(el => {
+                if ('video' === el.tagName.toLowerCase()) {
+                    const parent = el.parentElement;
+                    if (parent && parent.id !== 'camera') {
+                        const grandParent = parent.parentElement;
+                        if (grandParent) {
+                            grandParent.remove();
+                        }
+                    }
+                } else {
+                    el.remove()
+                }
+            });
     }
 }
 
@@ -163,7 +178,7 @@ function isMemberDefined(instance, member) {
     return !!instance && instance[member] !== undefined;
 }
 
-function leaveRoom() {
+async function leaveRoom() {
     try {
         if (_activeRoom) {
             _activeRoom.disconnect();
