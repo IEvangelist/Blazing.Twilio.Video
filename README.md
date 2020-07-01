@@ -1,13 +1,19 @@
 # Blazing.Twilio.Video
 
+## App start (user 1)
 ![app start](images/app-start.png)
 
-![app start](images/camera-selected.png)
+## Camera selected (user 1)
+![camera selected](images/camera-selected.png)
 
-![app start](images/participant.png)
+## Participant (user 2)
+![another user](images/participant.png)
 
-![app start](images/room-created.png)
+## Room created (user 1)
+![room created](images/room-created.png)
 
+## Join room (user 2)
 ![app start](images/party.png)
 
+## Party ensues (user 1)
 ![app start](images/party-0.png)
