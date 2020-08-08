@@ -2,7 +2,7 @@
 {
     public class Device
     {
-        public string DeviceId { get; set; } = "";
-        public string Label { get; set; } = "";
+        public string DeviceId { get; set; } = null!;
+        public string Label { get; set; } = null!;
     }
 }

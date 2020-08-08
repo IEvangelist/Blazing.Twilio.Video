@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 
 namespace Blazing.Twilio.WasmVideo.Client.Interop
 {
-    public class VideoJS
+    public static class VideoJS
     {
         public static ValueTask<Device[]> GetVideoDevicesAsync(
-              IJSRuntime? jsRuntime) =>
+              this IJSRuntime? jsRuntime) =>
               jsRuntime?.InvokeAsync<Device[]>(
                   "videoInterop.getVideoDevices") ?? new ValueTask<Device[]>();
 
         public static ValueTask StartVideoAsync(
-            IJSRuntime? jSRuntime,
+            this IJSRuntime? jSRuntime,
             string deviceId,
             string selector) =>
             jSRuntime?.InvokeVoidAsync(
@@ -20,7 +20,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Interop
                 deviceId, selector) ?? new ValueTask();
 
         public static ValueTask<bool> CreateOrJoinRoomAsync(
-            IJSRuntime? jsRuntime,
+            this IJSRuntime? jsRuntime,
             string roomName,
             string token) =>
             jsRuntime?.InvokeAsync<bool>(
@@ -28,7 +28,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Interop
                 roomName, token) ?? new ValueTask<bool>(false);
 
         public static ValueTask LeaveRoomAsync(
-            IJSRuntime? jsRuntime) =>
+            this IJSRuntime? jsRuntime) =>
             jsRuntime?.InvokeVoidAsync(
                 "videoInterop.leaveRoom") ?? new ValueTask();
     }

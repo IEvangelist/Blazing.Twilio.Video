@@ -9,6 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Cl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Shared", "Blazing.Twilio.WasmVideo\Shared\Blazing.Twilio.WasmVideo.Shared.csproj", "{CC370A73-7D66-4751-B25D-95DAC3667727}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F7634AC-C7C1-4612-B38B-12F7DA603532}"
+	ProjectSection(SolutionItems) = preProject
+		images\app-start.png = images\app-start.png
+		images\camera-selected.png = images\camera-selected.png
+		images\participant.png = images\participant.png
+		images\party-0.png = images\party-0.png
+		images\party.png = images\party.png
+		README.md = README.md
+		images\room-created.png = images\room-created.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

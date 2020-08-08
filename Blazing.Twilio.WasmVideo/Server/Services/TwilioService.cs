@@ -14,7 +14,7 @@ using ParticipantStatus = Twilio.Rest.Video.V1.Room.ParticipantResource.StatusEn
 
 namespace Blazing.Twilio.WasmVideo.Server.Services
 {
-    public class TwilioService : ITwilioService
+    public class TwilioService
     {
         readonly TwilioSettings _twilioSettings;
 

@@ -31,7 +31,7 @@ namespace Blazing.Twilio.WasmVideo.Server
                 settings.ApiSecret = GetEnvironmentVariable("TWILIO_API_SECRET");
                 settings.ApiKey = GetEnvironmentVariable("TWILIO_API_KEY");
             });
-            services.AddSingleton<ITwilioService, TwilioService>();
+            services.AddSingleton<TwilioService>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddResponseCompression(opts =>

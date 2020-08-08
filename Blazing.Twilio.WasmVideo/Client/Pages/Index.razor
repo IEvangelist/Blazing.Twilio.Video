@@ -21,7 +21,7 @@
                         </div>
                     </div>
                 </div>
-                @if (!(Rooms?.Any() ?? false))
+                @if (!(_rooms?.Any() ?? false))
                 {
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <p class="lead mb-0">
@@ -31,7 +31,7 @@
                 }
                 else
                 {
-                    @foreach (var room in Rooms!)
+                    @foreach (var room in _rooms!)
                     {
                         <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
                            @(room.Name == _activeRoom ? "active" : null)"

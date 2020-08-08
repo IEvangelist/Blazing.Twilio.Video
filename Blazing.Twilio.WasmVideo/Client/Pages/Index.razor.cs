@@ -21,7 +21,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
         [Inject]
         protected HttpClient Http { get; set; } = null!;
 
-        protected List<RoomDetails> Rooms { get; private set; } = new List<RoomDetails>();
+        List<RoomDetails> _rooms = new List<RoomDetails>();
 
         string? _roomName;
         string? _activeCamera;
@@ -30,7 +30,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
+            _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
 
             _hubConnection = new HubConnectionBuilder()
                 .AddMessagePackProtocol()
@@ -45,11 +45,11 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
 
         async ValueTask OnLeaveRoom()
         {
-            await VideoJS.LeaveRoomAsync(JavaScript);
+            await JavaScript.LeaveRoomAsync();
             await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom = null);
             if (!string.IsNullOrWhiteSpace(_activeCamera))
             {
-                await VideoJS.StartVideoAsync(JavaScript, _activeCamera, "#camera");
+                await JavaScript.StartVideoAsync(_activeCamera, "#camera");
             }
         }
 
@@ -59,13 +59,13 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
         async Task OnRoomAdded(string roomName) =>
             await InvokeAsync(async () =>
             {
-                Rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
+                _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
                 StateHasChanged();
             });
 
         protected async ValueTask TryAddRoom(object args)
         {
-            if (string.IsNullOrWhiteSpace(_roomName))
+            if (_roomName.IsNullOrEmpty())
             {
                 return;
             }
@@ -89,7 +89,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
 
         protected async ValueTask<bool> TryJoinRoom(string? roomName)
         {
-            if (string.IsNullOrWhiteSpace(roomName))
+            if (roomName.IsNullOrEmpty())
             {
                 return false;
             }
@@ -100,7 +100,7 @@ namespace Blazing.Twilio.WasmVideo.Client.Pages
                 return false;
             }
 
-            var joined = await VideoJS.CreateOrJoinRoomAsync(JavaScript, roomName, jwt.Token);
+            var joined = await JavaScript.CreateOrJoinRoomAsync(roomName!, jwt.Token);
             if (joined)
             {
                 _activeRoom = roomName;

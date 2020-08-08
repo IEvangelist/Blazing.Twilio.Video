@@ -12,12 +12,12 @@ namespace Blazing.Twilio.WasmVideo.Server.Controllers
     {
         [HttpGet("token")]
         public IActionResult GetToken(
-            [FromServices] ITwilioService twilioService) =>
+            [FromServices] TwilioService twilioService) =>
              new JsonResult(twilioService.GetTwilioJwt(User.Identity.Name));
 
         [HttpGet("rooms")]
         public async Task<IActionResult> GetRooms(
-            [FromServices] ITwilioService twilioService)
+            [FromServices] TwilioService twilioService)
             => new JsonResult(await twilioService.GetAllRoomsAsync());
     }
 }
