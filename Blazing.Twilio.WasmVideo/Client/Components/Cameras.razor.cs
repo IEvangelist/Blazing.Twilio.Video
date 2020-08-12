@@ -14,6 +14,8 @@ namespace Blazing.Twilio.WasmVideo.Client.Components
         [Parameter]
         public EventCallback<string> CameraChanged { get; set; }
 
+        const string DefaultDeviceId = "default-device-id";
+
         protected Device[]? Devices { get; private set; }
         protected CameraState State { get; private set; }
         protected bool HasDevices => State == CameraState.FoundCameras;
@@ -27,10 +29,21 @@ namespace Blazing.Twilio.WasmVideo.Client.Components
             State = Devices != null && Devices.Length > 0
                     ? CameraState.FoundCameras
                     : CameraState.Error;
+
+            var defaultDeviceId = await JavaScript.GetAsync<string>(DefaultDeviceId);
+            if (!string.IsNullOrWhiteSpace(defaultDeviceId))
+            {
+                await SelectCamera(defaultDeviceId, false);
+            }
         }
 
-        protected async ValueTask SelectCamera(string deviceId)
+        protected async ValueTask SelectCamera(string deviceId, bool persist = true)
         {
+            if (persist)
+            {
+                await JavaScript.SetAsync(DefaultDeviceId, deviceId);
+            }
+
             await JavaScript.StartVideoAsync(deviceId, "#camera");
             _activeCamera = deviceId;
 

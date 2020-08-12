@@ -17,7 +17,7 @@ namespace Blazing.Twilio.WasmVideo.Server.Controllers
 
         [HttpGet("rooms")]
         public async Task<IActionResult> GetRooms(
-            [FromServices] TwilioService twilioService)
-            => new JsonResult(await twilioService.GetAllRoomsAsync());
+            [FromServices] TwilioService twilioService) =>
+            new JsonResult(await twilioService.GetAllRoomsAsync());
     }
 }

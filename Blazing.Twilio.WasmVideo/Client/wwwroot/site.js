@@ -200,3 +200,9 @@ window.videoInterop = {
     createOrJoinRoom,
     leaveRoom
 };
+
+window.store = {
+    get: key => window.localStorage[key],
+    set: (key, value) => window.localStorage[key] = value,
+    delete: key => delete window.localStorage[key]
+};
