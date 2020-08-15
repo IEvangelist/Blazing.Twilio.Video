@@ -6,7 +6,8 @@ let _dominantSpeaker = null;
 async function getVideoDevices() {
     try {
         let devices = await navigator.mediaDevices.enumerateDevices();
-        if (devices && devices.length === 0) {
+        if (devices &&
+           (devices.length === 0 || devices.every(d => d.deviceId === ""))) {
             await navigator.mediaDevices.getUserMedia({
                 video: true
             });
