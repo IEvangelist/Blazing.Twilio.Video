@@ -1,7 +1,6 @@
-﻿namespace Blazing.Twilio.WasmVideo.Shared
+﻿namespace Blazing.Twilio.WasmVideo.Shared;
+
+public class TwilioJwt
 {
-    public class TwilioJwt
-    {
-        public string? Token { get; set; } = null!;
-    }
+    public string? Token { get; set; } = null!;
 }
