@@ -1,9 +1,8 @@
-﻿namespace Blazing.Twilio.WasmVideo.Shared
+﻿namespace Blazing.Twilio.WasmVideo.Shared;
+
+public enum CameraState
 {
-    public enum CameraState
-    {
-        LoadingCameras,
-        FoundCameras,
-        Error
-    }
+    LoadingCameras,
+    FoundCameras,
+    Error
 }
