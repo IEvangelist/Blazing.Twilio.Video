@@ -1,5 +1,7 @@
 # Blazing.Twilio.Video
 
+[![.NET](https://github.com/IEvangelist/Blazing.Twilio.Video/actions/workflows/dotnet.yml/badge.svg)](https://github.com/IEvangelist/Blazing.Twilio.Video/actions/workflows/dotnet.yml)
+
 ## App start (user 1)
 ![app start](images/app-start.png)
 
