@@ -12,8 +12,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F7634AC-C7C1-4612-B38B-12F7DA603532}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		images\app-start.png = images\app-start.png
 		images\camera-selected.png = images\camera-selected.png
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		LICENSE = LICENSE
 		images\participant.png = images\participant.png
 		images\party-0.png = images\party-0.png
 		images\party.png = images\party.png
