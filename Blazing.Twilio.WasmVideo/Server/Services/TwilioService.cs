@@ -1,12 +1,5 @@
-﻿using Blazing.Twilio.WasmVideo.Server.Options;
-using Blazing.Twilio.WasmVideo.Shared;
-using Twilio;
-using Twilio.Base;
-using Twilio.Jwt.AccessToken;
-using Twilio.Rest.Video.V1;
-using Twilio.Rest.Video.V1.Room;
-using MicrosoftOptions = Microsoft.Extensions.Options;
-using ParticipantStatus = Twilio.Rest.Video.V1.Room.ParticipantResource.StatusEnum;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
 namespace Blazing.Twilio.WasmVideo.Server.Services;
 
@@ -17,23 +10,22 @@ public class TwilioService
     public TwilioService(MicrosoftOptions.IOptions<TwilioSettings> twilioOptions)
     {
         _twilioSettings =
-            twilioOptions?.Value
-         ?? throw new ArgumentNullException(nameof(twilioOptions));
+            twilioOptions?.Value ??
+            throw new ArgumentNullException(nameof(twilioOptions));
 
-        TwilioClient.Init(_twilioSettings.ApiKey, _twilioSettings.ApiSecret);
+        TwilioClient.Init(
+            _twilioSettings.ApiKey,
+            _twilioSettings.ApiSecret,
+            _twilioSettings.AccountSid);
     }
 
     public TwilioJwt GetTwilioJwt(string? identity) =>
-        new TwilioJwt
-        {
-            Token = new Token(
-                _twilioSettings.AccountSid,
-                _twilioSettings.ApiKey,
-                _twilioSettings.ApiSecret,
-                identity ?? GetName(),
-                grants: new HashSet<IGrant> { new VideoGrant() })
-            .ToJwt()
-        };
+        new(Token: new Token(
+            _twilioSettings.AccountSid,
+            _twilioSettings.ApiKey,
+            _twilioSettings.ApiSecret,
+            identity ?? GetName(),
+            grants: new HashSet<IGrant> { new VideoGrant() }).ToJwt());
 
     public async ValueTask<IEnumerable<RoomDetails>> GetAllRoomsAsync()
     {
@@ -95,8 +87,6 @@ public class TwilioService
 
 static class StringArrayExtensions
 {
-    static readonly Random Random = new Random((int)DateTime.Now.Ticks);
-
-    internal static string RandomElement(this IReadOnlyList<string> array)
-        => array[Random.Next(array.Count)];
+    internal static string RandomElement(this IReadOnlyList<string> array) =>
+        array[Random.Shared.Next(array.Count)];
 }

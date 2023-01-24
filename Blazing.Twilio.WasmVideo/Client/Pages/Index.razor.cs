@@ -1,23 +1,18 @@
-﻿using Blazing.Twilio.WasmVideo.Client.Interop;
-using Blazing.Twilio.WasmVideo.Shared;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop;
-using System.Net.Http.Json;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
 namespace Blazing.Twilio.WasmVideo.Client.Pages;
 
 public partial class Index
 {
-    [Inject] 
-    protected IJSRuntime? JavaScript { get; set; }
-    [Inject] 
-    protected NavigationManager NavigationManager { get; set; } = null!;
     [Inject]
-    protected HttpClient Http { get; set; } = null!;
+    public required ISiteVideoJavaScriptModule JavaScript { get; set; }
+    [Inject]
+    public required NavigationManager NavigationManager { get; set; }
+    [Inject]
+    public required HttpClient Http { get; set; }
 
-    List<RoomDetails> _rooms = new List<RoomDetails>();
+    List<RoomDetails> _rooms = new();
 
     string? _roomName;
     string? _activeCamera;
@@ -26,7 +21,10 @@ public partial class Index
 
     protected override async Task OnInitializedAsync()
     {
-        _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
+        await JavaScript.InitiailizeModuleAsync();
+
+        _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms")
+            ?? new();
 
         _hubConnection = new HubConnectionBuilder()
             .AddMessagePackProtocol()
@@ -41,21 +39,25 @@ public partial class Index
 
     async ValueTask OnLeaveRoom()
     {
+        if (_hubConnection is null)
+            return;
+
         await JavaScript.LeaveRoomAsync();
         await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom = null);
-        if (!string.IsNullOrWhiteSpace(_activeCamera))
+        if (!_activeCamera.IsNullOrWhiteSpace())
         {
             await JavaScript.StartVideoAsync(_activeCamera, "#camera");
         }
     }
 
-    async Task OnCameraChanged(string activeCamera) => 
-        await InvokeAsync(() => _activeCamera = activeCamera);
+    Task OnCameraChanged(string activeCamera) =>
+        InvokeAsync(() => _activeCamera = activeCamera);
 
-    async Task OnRoomAdded(string roomName) =>
-        await InvokeAsync(async () =>
+    Task OnRoomAdded(string roomName) =>
+        InvokeAsync(async () =>
         {
-            _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms");
+            _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms")
+                ?? new();
             StateHasChanged();
         });
 
@@ -85,19 +87,19 @@ public partial class Index
 
     protected async ValueTask<bool> TryJoinRoom(string? roomName)
     {
-        if (roomName.IsNullOrEmpty())
+        if (roomName.IsNullOrWhiteSpace())
         {
             return false;
         }
 
         var jwt = await Http.GetFromJsonAsync<TwilioJwt>("api/twilio/token");
-        if (jwt?.Token is null)
+        if (jwt is { Token: null })
         {
             return false;
         }
 
         var joined = await JavaScript.CreateOrJoinRoomAsync(roomName!, jwt.Token);
-        if (joined)
+        if (joined && _hubConnection is not null)
         {
             _activeRoom = roomName;
             await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom);

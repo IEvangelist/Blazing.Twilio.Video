@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Server", "Blazing.Twilio.WasmVideo\Server\Blazing.Twilio.WasmVideo.Server.csproj", "{290FA210-E7E8-4BAA-A1C7-5AE2A72A8387}"
 EndProject
@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazing.Twilio.WasmVideo.Sh
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F7634AC-C7C1-4612-B38B-12F7DA603532}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		images\app-start.png = images\app-start.png
 		images\camera-selected.png = images\camera-selected.png
 		images\participant.png = images\participant.png

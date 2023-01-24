@@ -1,6 +1,10 @@
-﻿namespace Blazing.Twilio.WasmVideo.Shared;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
-public class TwilioJwt
-{
-    public string? Token { get; set; } = null!;
-}
+namespace Blazing.Twilio.WasmVideo.Shared;
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Token"></param>
+public readonly record struct TwilioJwt(string? Token);

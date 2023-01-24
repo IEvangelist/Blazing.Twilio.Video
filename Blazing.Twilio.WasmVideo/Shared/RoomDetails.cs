@@ -1,12 +1,17 @@
-﻿namespace Blazing.Twilio.WasmVideo.Shared;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
 
-public class RoomDetails
-{
-    public string? Id { get; set; } = null!;
+namespace Blazing.Twilio.WasmVideo.Shared;
 
-    public string? Name { get; set; } = null!;
-
-    public int ParticipantCount { get; set; }
-
-    public int MaxParticipants { get; set; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="ParticipantCount"></param>
+/// <param name="MaxParticipants"></param>
+public readonly record struct RoomDetails(
+    string? Id,
+    string? Name,
+    int ParticipantCount,
+    int MaxParticipants);

@@ -1,10 +1,13 @@
-﻿namespace Blazing.Twilio.WasmVideo.Server.Options;
+﻿// Copyright (c) David Pine. All rights reserved.
+// Licensed under the MIT License.
+
+namespace Blazing.Twilio.WasmVideo.Server.Options;
 
 public class TwilioSettings
 {
     /// <summary>
- /// The primary Twilio account SID, displayed prominently on your twilio.com/console dashboard.
- /// </summary>
+    /// The primary Twilio account SID, displayed prominently on your twilio.com/console dashboard.
+    /// </summary>
     public string? AccountSid { get; set; }
 
     /// <summary>

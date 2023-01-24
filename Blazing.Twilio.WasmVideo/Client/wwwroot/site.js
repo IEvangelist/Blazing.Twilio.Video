@@ -3,16 +3,19 @@ let _activeRoom = null;
 let _participants = new Map();
 let _dominantSpeaker = null;
 
-async function getVideoDevices() {
+export const getVideoDevices = async () => {
     try {
+        // Ask the first time to prime the underlying device list.
         let devices = await navigator.mediaDevices.enumerateDevices();
         if (devices &&
-           (devices.length === 0 || devices.every(d => d.deviceId === ""))) {
+            (devices.length === 0 || devices.every(d => d.deviceId === ""))) {
             await navigator.mediaDevices.getUserMedia({
                 video: true
             });
         }
 
+        // Ask again, if the user allowed it the device list is now poplated.
+        // If not, the const returns an empty array.
         devices = await navigator.mediaDevices.enumerateDevices();
         if (devices && devices.length) {
             const deviceResults = [];
@@ -29,9 +32,9 @@ async function getVideoDevices() {
     }
 
     return [];
-}
+};
 
-async function startVideo(deviceId, selector) {
+export const startVideo = async (deviceId, selector) => {
     const cameraContainer = document.querySelector(selector);
     if (!cameraContainer) {
         return;
@@ -48,9 +51,9 @@ async function startVideo(deviceId, selector) {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
-async function createOrJoinRoom(roomName, token) {
+export const createOrJoinRoom = async (roomName, token) => {
     try {
         if (_activeRoom) {
             _activeRoom.disconnect();
@@ -80,33 +83,33 @@ async function createOrJoinRoom(roomName, token) {
     }
 
     return !!_activeRoom;
-}
+};
 
-function initialize(participants) {
+const initialize = (participants) => {
     _participants = participants;
     if (_participants) {
         _participants.forEach(participant => registerParticipantEvents(participant));
     }
-}
+};
 
-function add(participant) {
+const add = (participant) => {
     if (_participants && participant) {
         _participants.set(participant.sid, participant);
         registerParticipantEvents(participant);
     }
-}
+};
 
-function remove(participant) {
+const remove = (participant) => {
     if (_participants && _participants.has(participant.sid)) {
         _participants.delete(participant.sid);
     }
-}
+};
 
-function loudest(participant) {
+const loudest = (participant) => {
     _dominantSpeaker = participant;
-}
+};
 
-function registerParticipantEvents(participant) {
+const registerParticipantEvents = (participant) => {
     if (participant) {
         participant.tracks.forEach(publication => subscribe(publication));
         participant.on('trackPublished', publication => subscribe(publication));
@@ -117,16 +120,16 @@ function registerParticipantEvents(participant) {
                 }
             });
     }
-}
+};
 
-function subscribe(publication) {
+const subscribe = (publication) => {
     if (isMemberDefined(publication, 'on')) {
         publication.on('subscribed', track => attachTrack(track));
         publication.on('unsubscribed', track => detachTrack(track));
     }
-}
+};
 
-function attachTrack(track) {
+const attachTrack = (track) => {
     if (isMemberDefined(track, 'attach')) {
         const audioOrVideo = track.attach();
         audioOrVideo.id = track.sid;
@@ -154,9 +157,9 @@ function attachTrack(track) {
                 .appendChild(audioOrVideo);
         }
     }
-}
+};
 
-function detachTrack(track) {
+const detachTrack = (track) => {
     if (this.isMemberDefined(track, 'detach')) {
         track.detach()
             .forEach(el => {
@@ -173,13 +176,13 @@ function detachTrack(track) {
                 }
             });
     }
-}
+};
 
-function isMemberDefined(instance, member) {
+const isMemberDefined = (instance, member) => {
     return !!instance && instance[member] !== undefined;
-}
+};
 
-async function leaveRoom() {
+export const leaveRoom = async () => {
     try {
         if (_activeRoom) {
             _activeRoom.disconnect();
@@ -193,17 +196,4 @@ async function leaveRoom() {
     catch (error) {
         console.error(error);
     }
-}
-
-window.videoInterop = {
-    getVideoDevices,
-    startVideo,
-    createOrJoinRoom,
-    leaveRoom
-};
-
-window.store = {
-    get: key => window.localStorage[key],
-    set: (key, value) => window.localStorage[key] = value,
-    delete: key => delete window.localStorage[key]
 };
