@@ -17,35 +17,36 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
     }
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.InitiailizeModuleAsync" />
-    public async ValueTask InitiailizeModuleAsync() =>
-        _siteModule =
+    public async ValueTask InitiailizeModuleAsync()
+    {
+        _siteModule ??=
             await _javaScript.InvokeAsync<IJSInProcessObjectReference>(
-                "import",
-                "./site.js");
+                "import", "./site.js");
+    }
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.GetVideoDevicesAsync" />
     public ValueTask<Device[]> GetVideoDevicesAsync() =>
-          _siteModule?.InvokeAsync<Device[]>(
-              "getVideoDevices") ?? ValueTask.FromResult(Array.Empty<Device>());
+          _siteModule?.InvokeAsync<Device[]>("getVideoDevices")
+        ?? ValueTask.FromResult(Array.Empty<Device>());
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.StartVideoAsync" />
     public ValueTask StartVideoAsync(
         string deviceId,
         string selector) =>
         _siteModule?.InvokeVoidAsync(
-            "startVideo",
-            deviceId, selector) ?? ValueTask.CompletedTask;
+            "startVideo", deviceId, selector)
+        ?? ValueTask.CompletedTask;
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.CreateOrJoinRoomAsync" />
     public ValueTask<bool> CreateOrJoinRoomAsync(
         string roomName,
         string token) =>
         _siteModule?.InvokeAsync<bool>(
-            "createOrJoinRoom",
-            roomName, token) ?? ValueTask.FromResult(false);
+            "createOrJoinRoom", roomName, token)
+        ?? ValueTask.FromResult(false);
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.LeaveRoomAsync" />
     public ValueTask LeaveRoomAsync() =>
-        _siteModule?.InvokeVoidAsync(
-            "leaveRoom") ?? ValueTask.CompletedTask;
+        _siteModule?.InvokeVoidAsync("leaveRoom")
+        ?? ValueTask.CompletedTask;
 }

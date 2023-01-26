@@ -1,20 +1,18 @@
 ﻿@page "/"
-@using Blazing.Twilio.WasmVideo.Client.Components
 
 <div class="row h-100 pt-5">
     <div class="col-3">
         <div class="jumbotron p-4">
-            <Cameras CameraChanged="OnCameraChanged" />
             <h5><i class="fas fa-video"></i> Rooms</h5>
             <div class="list-group">
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <div class="input-group">
                         <input type="text" class="form-control form-control-lg"
-                               placeholder="Room name" aria-label="Room Name" disabled="@(_activeCamera is null)"
+                               placeholder="Room name" aria-label="Room Name" disabled="@(ActiveCamera is null)"
                                @bind="_roomName" @onkeydown="@(async args => await TryAddRoom(args))" />
                         <div class="input-group-append">
                             <button class="btn btn-lg twilio-btn-red"
-                                    disabled="@(_activeCamera is null || _roomName is null)"
+                                    disabled="@(ActiveCamera is null || _roomName is null)"
                                     @onclick="@(async args => await TryAddRoom(args))">
                                 <i class="far fa-plus-square" aria-label="Create room"></i> Create
                             </button>

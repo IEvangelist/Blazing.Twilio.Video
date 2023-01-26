@@ -11,11 +11,12 @@ public partial class Index
     public required NavigationManager NavigationManager { get; set; }
     [Inject]
     public required HttpClient Http { get; set; }
+    [CascadingParameter]
+    protected string? ActiveCamera { get; set; }
 
     List<RoomDetails> _rooms = new();
 
     string? _roomName;
-    string? _activeCamera;
     string? _activeRoom;
     HubConnection? _hubConnection;
 
@@ -44,14 +45,11 @@ public partial class Index
 
         await JavaScript.LeaveRoomAsync();
         await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom = null);
-        if (!_activeCamera.IsNullOrWhiteSpace())
+        if (!ActiveCamera.IsNullOrWhiteSpace())
         {
-            await JavaScript.StartVideoAsync(_activeCamera, "#camera");
+            await JavaScript.StartVideoAsync(ActiveCamera, "#camera");
         }
     }
-
-    Task OnCameraChanged(string activeCamera) =>
-        InvokeAsync(() => _activeCamera = activeCamera);
 
     Task OnRoomAdded(string roomName) =>
         InvokeAsync(async () =>

@@ -2,15 +2,26 @@
 
 <MudThemeProvider />
 
+
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudText Typo="Typo.h5" Class="ml-3">
+            <MudIcon Icon="@SvgIcons.Blazor" Color="Color.Inherit" />
+            💜
+            <MudIcon Icon="@SvgIcons.Twilio" Color="Color.Inherit" />
+        </MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" 
+        Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+         <MudSpacer />
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub"
+                       Color="Color.Inherit" 
+                       Href="https://github.com/IEvangelist/Blazing.Twilio.Video" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        @*NavMenu*@
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
+        </MudDrawerHeader>
+        <Cameras CameraChanged="OnCameraChanged" />
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large">
@@ -20,7 +31,12 @@
 </MudLayout>
 
 @code {
-    bool _drawerOpen = true;
+    private bool _drawerOpen = false;
 
-    void DrawerToggle() => _drawerOpen = _drawerOpen is false;
+    protected string? ActiveCamera { get; set; }
+
+    Task OnCameraChanged(string activeCamera) =>
+        InvokeAsync(() => ActiveCamera = activeCamera);
+
+    void DrawerToggle() => _drawerOpen = !_drawerOpen;
 }

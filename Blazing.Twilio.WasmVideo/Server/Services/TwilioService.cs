@@ -14,9 +14,9 @@ public class TwilioService
             throw new ArgumentNullException(nameof(twilioOptions));
 
         TwilioClient.Init(
-            _twilioSettings.ApiKey,
-            _twilioSettings.ApiSecret,
-            _twilioSettings.AccountSid);
+            _twilioSettings.ApiKey ?? "no-key",
+            _twilioSettings.ApiSecret ?? "no-secret",
+            _twilioSettings.AccountSid ?? "no-sid");
     }
 
     public TwilioJwt GetTwilioJwt(string? identity) =>
