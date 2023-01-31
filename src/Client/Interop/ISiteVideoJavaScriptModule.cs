@@ -9,7 +9,9 @@ namespace Blazing.Twilio.Video.Client.Interop;
 public interface ISiteVideoJavaScriptModule
 {
     /// <summary>
-    /// Initializes the <c>site.js</c> module.
+    /// Starts a task that asynchronously Initializes the <c>site.js</c> module.
+    /// Subsequent calls will use a cached reference to the module, and it only
+    /// is intialized once.
     /// </summary>
     ValueTask InitiailizeModuleAsync();
 
@@ -20,23 +22,25 @@ public interface ISiteVideoJavaScriptModule
     /// <param name="roomName">The name of the room.</param>
     /// <param name="token">The token used to create or join the named room.</param>
     /// <returns><c>true</c> if created or joined, otherwise <c>false</c>.</returns>
-    ValueTask<bool> CreateOrJoinRoomAsync(string roomName, string token);
+    bool CreateOrJoinRoom(string roomName, string token);
 
     /// <summary>
     /// Gets an array of video devices from the current browser.
     /// </summary>
     /// <returns>An array of <see cref="Device"/> objects.</returns>
+    /// <remarks>This will never return <c>null</c>, instead it will
+    /// return an empty array <see cref="Device[]"/>.</remarks>
     ValueTask<Device[]> GetVideoDevicesAsync();
 
     /// <summary>
     /// Leave the current contextual room.
     /// </summary>
-    ValueTask LeaveRoomAsync();
+    void LeaveRoom();
 
     /// <summary>
     /// Start video for the given <paramref name="deviceId"/> and <paramref name="selector"/>.
     /// </summary>
     /// <param name="deviceId">The device identifier to start.</param>
     /// <param name="selector">The DOM selector for to start videon on.</param>
-    ValueTask StartVideoAsync(string deviceId, string selector);
+    void StartVideo(string deviceId, string selector);
 }

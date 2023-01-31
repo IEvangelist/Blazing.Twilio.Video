@@ -46,8 +46,8 @@ public partial class Cameras
             LocalStorage.SetItem(DefaultDeviceId, deviceId);
         }
 
-        await JavaScript.StartVideoAsync(deviceId, "#camera");
-        _activeCamera = deviceId;
+        JavaScript.StartVideo(
+            _activeCamera = deviceId, "#camera");
 
         if (CameraChanged.HasDelegate)
         {

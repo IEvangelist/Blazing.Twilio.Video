@@ -16,6 +16,7 @@ public partial class Index
 
     List<RoomDetails> _rooms = new();
 
+    RoomDetails _selectedRoom;
     string? _roomName;
     string? _activeRoom;
     HubConnection? _hubConnection;
@@ -43,11 +44,11 @@ public partial class Index
         if (_hubConnection is null)
             return;
 
-        await JavaScript.LeaveRoomAsync();
+        JavaScript.LeaveRoom();
         await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom = null);
         if (!ActiveCamera.IsNullOrWhiteSpace())
         {
-            await JavaScript.StartVideoAsync(ActiveCamera, "#camera");
+            JavaScript.StartVideo(ActiveCamera, "#camera");
         }
     }
 
@@ -96,7 +97,7 @@ public partial class Index
             return false;
         }
 
-        var joined = await JavaScript.CreateOrJoinRoomAsync(roomName!, jwt.Token);
+        var joined = JavaScript.CreateOrJoinRoom(roomName!, jwt.Token);
         if (joined && _hubConnection is not null)
         {
             _activeRoom = roomName;
