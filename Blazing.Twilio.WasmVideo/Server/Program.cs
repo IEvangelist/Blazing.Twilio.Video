@@ -7,8 +7,8 @@ builder.Services
     .AddSignalR(options => options.EnableDetailedErrors = true)
     .AddMessagePackProtocol();
 builder.Services
-    .AddOptions<TwilioSettings>()
-    .BindConfiguration(nameof(TwilioSettings));
+    .Configure<TwilioSettings>(
+    builder.Configuration.GetSection(nameof(TwilioSettings)));
 builder.Services.AddSingleton<TwilioService>();
 builder.Services.AddRazorPages();
 builder.Services
