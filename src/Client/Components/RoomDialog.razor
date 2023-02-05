@@ -2,8 +2,7 @@
     <DialogContent>
         <MudContainer MaxWidth="MaxWidth.Large">
             <div class="d-flex gap-4 align-content-center align-center">
-                <MudTextField DebounceInterval="500"
-                              Label="Room" T="string" Class="flex-grow-1"
+                <MudTextField Label="Room" T="string" Class="flex-grow-1"
                               Variant="Variant.Outlined" Adornment="Adornment.End"
                               @bind-Value="_roomName" Clearable="true"
                               OnKeyDown=@(async (args) => await TryAddRoom(args))

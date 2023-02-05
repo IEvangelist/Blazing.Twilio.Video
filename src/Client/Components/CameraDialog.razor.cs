@@ -5,17 +5,15 @@ namespace Blazing.Twilio.Video.Client.Components;
 
 public sealed partial class CameraDialog : IDisposable
 {
-    [Inject]
-    public required ISiteVideoJavaScriptModule JavaScript { get; set; }
+    [Inject] public required ISiteVideoJavaScriptModule JavaScript { get; set; }
 
-    [Inject]
-    public required AppState AppState { get; set; }
+    [Inject] public required AppState AppState { get; set; }
+
+    [Parameter]
+    public required AppEventSubject AppEvents { get; set; }
 
     [CascadingParameter]
     public required MudDialogInstance MudDialog { get; set; }
-
-    [EditorRequired, Parameter]
-    public EventCallback<string> CameraChanged { get; set; }
 
     Device[]? Devices { get; set; }
     RequestCameraState State { get; set; }
@@ -47,14 +45,11 @@ public sealed partial class CameraDialog : IDisposable
             _selectedCameraId, "#camera-preview");
     }
 
-    async Task SaveCameraSelection()
+    void SaveCameraSelection()
     {
-        AppState.SelectedCameraId = _selectedCameraId;
-
-        if (CameraChanged.HasDelegate)
-        {
-            await CameraChanged.InvokeAsync(_selectedCameraId);
-        }
+        AppEvents.TriggerAppEvent(new AppEventMessage(
+            Value: _selectedCameraId!,
+            MessageType: MessageType.CameraSelected));
 
         MudDialog.Close(DialogResult.Ok(true));
         JavaScript.StopVideo();

@@ -91,6 +91,10 @@ export const createOrJoinRoom = async (roomName, token) => {
             _activeRoom.disconnect();
         }
 
+        if (!_videoTrack) {
+            await startVideo(localStorage['camera-device-id'], 'participant-1');
+        }
+
         const audioTrack = await Twilio.Video.createLocalAudioTrack();
         const tracks = [audioTrack, _videoTrack];
         _activeRoom = await Twilio.Video.connect(
@@ -120,14 +124,14 @@ export const createOrJoinRoom = async (roomName, token) => {
 const initialize = (participants) => {
     _participants = participants;
     if (_participants) {
-        _participants.forEach(participant => registerParticipantEvents(participant));
+        _participants.forEach(participant => registerParticipantEvents(participant, true));
     }
 };
 
 const add = (participant) => {
     if (_participants && participant) {
         _participants.set(participant.sid, participant);
-        registerParticipantEvents(participant);
+        registerParticipantEvents(participant, false);
     }
 };
 
@@ -141,10 +145,10 @@ const loudest = (participant) => {
     _dominantSpeaker = participant;
 };
 
-const registerParticipantEvents = (participant) => {
+const registerParticipantEvents = (participant, isLocal) => {
     if (participant) {
-        participant.tracks.forEach(publication => subscribe(publication));
-        participant.on('trackPublished', publication => subscribe(publication));
+        participant.tracks.forEach(publication => subscribe(publication, isLocal));
+        participant.on('trackPublished', publication => subscribe(publication, isLocal));
         participant.on('trackUnpublished',
             publication => {
                 if (publication && publication.track) {
@@ -154,40 +158,20 @@ const registerParticipantEvents = (participant) => {
     }
 };
 
-const subscribe = (publication) => {
+const subscribe = (publication, isLocal) => {
     if (isMemberDefined(publication, 'on')) {
-        publication.on('subscribed', track => attachTrack(track));
+        publication.on('subscribed', track => attachTrack(track, isLocal));
         publication.on('unsubscribed', track => detachTrack(track));
     }
 };
 
-const attachTrack = (track) => {
+const attachTrack = (track, isLocal) => {
     if (isMemberDefined(track, 'attach')) {
         const audioOrVideo = track.attach();
         audioOrVideo.id = track.sid;
 
-        if ('video' === audioOrVideo.tagName.toLowerCase()) {
-            const responsiveDiv = document.createElement('div');
-            responsiveDiv.id = track.sid;
-            responsiveDiv.classList.add('embed-responsive');
-            responsiveDiv.classList.add('embed-responsive-16by9');
-
-            const responsiveItem = document.createElement('div');
-            responsiveItem.classList.add('embed-responsive-item');
-
-            // Similar to.
-            // <div class="embed-responsive embed-responsive-16by9">
-            //   <div id="camera" class="embed-responsive-item">
-            //     <video></video>
-            //   </div>
-            // </div>
-            responsiveItem.appendChild(audioOrVideo);
-            responsiveDiv.appendChild(responsiveItem);
-            document.getElementById('participants').appendChild(responsiveDiv);
-        } else {
-            document.getElementById('participants')
-                .appendChild(audioOrVideo);
-        }
+        document.getElementById(`participant-${isLocal ? 1 : 2}`)
+            .appendChild(audioOrVideo);
     }
 };
 

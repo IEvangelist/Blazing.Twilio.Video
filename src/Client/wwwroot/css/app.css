@@ -166,3 +166,7 @@ video {
     height: auto;
     max-width: 100%;
 }
+
+.snacks {
+    font-size: 1.5rem;
+}

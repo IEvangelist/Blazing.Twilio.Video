@@ -32,9 +32,11 @@ public sealed class AppEventSubject : IDisposable
 /// </summary>
 /// <param name="Value">The value of the message.</param>
 /// <param name="MessageType">The type of the message.</param>
+/// <param name="TwilioToken">The Twilio Token (JWT).</param>
 public readonly record struct AppEventMessage(
     string Value,
-    MessageType MessageType);
+    MessageType MessageType,
+    string? TwilioToken = default);
 
 public enum MessageType
 {

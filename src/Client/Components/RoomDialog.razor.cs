@@ -1,9 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazing.Twilio.Video.Client.Services;
-using Microsoft.AspNetCore.SignalR.Client;
-
 namespace Blazing.Twilio.Video.Client.Components;
 
 public sealed partial class RoomDialog
@@ -19,14 +16,11 @@ public sealed partial class RoomDialog
     [Inject]
     public required AppState AppState { get; set; }
 
-    [CascadingParameter]
-    public required MudDialogInstance MudDialog { get; set; }
-
-    [CascadingParameter]
+    [Parameter]
     public required AppEventSubject AppEvents { get; set; }
 
-    [Parameter, EditorRequired]
-    public required EventCallback<(string RoomName, string TwilioToken)> RoomCreatedOrJoined { get; set; }
+    [CascadingParameter]
+    public required MudDialogInstance MudDialog { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,23 +62,11 @@ public sealed partial class RoomDialog
             return false;
         }
 
-        //AppEvents.TriggerAppEvent(new AppEventMessage(
-        //    Value: ));
-
-        if (RoomCreatedOrJoined.HasDelegate)
-        {
-            await RoomCreatedOrJoined.InvokeAsync((roomName!, jwt.Token));
-        }
+        AppEvents.TriggerAppEvent(new AppEventMessage(
+            Value: roomName,
+            TwilioToken: jwt.Token,
+            MessageType: MessageType.RoomCreatedOrJoined));
 
         return true;
-
-        //var joined = JavaScript.CreateOrJoinRoom(roomName!, jwt.Token);
-        //if (joined && _hubConnection is not null)
-        //{
-        //    AppState.ActiveRoomName = roomName;
-        //    await _hubConnection.InvokeAsync(HubEventNames.RoomsUpdated, AppState.ActiveRoomName);
-        //}
-        //
-        //return joined;
     }
 }
