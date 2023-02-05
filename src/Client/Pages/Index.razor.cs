@@ -1,32 +1,39 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Client.Services;
+
 namespace Blazing.Twilio.Video.Client.Pages;
 
-public partial class Index
+public sealed partial class Index : IDisposable
 {
     [Inject]
     public required ISiteVideoJavaScriptModule JavaScript { get; set; }
+
     [Inject]
     public required NavigationManager NavigationManager { get; set; }
+
     [Inject]
     public required HttpClient Http { get; set; }
-    [CascadingParameter]
-    protected string? ActiveCamera { get; set; }
 
-    List<RoomDetails> _rooms = new();
+    [Inject]
+    public required AppState AppState { get; set; }
+
+    [Inject]
+    public required ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter]
+    public required AppEventSubject AppEvents { get; set; }
 
     RoomDetails _selectedRoom;
     string? _roomName;
-    string? _activeRoom;
     HubConnection? _hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
-        await JavaScript.InitiailizeModuleAsync();
+        AppState.StateChanged += StateHasChanged;
 
-        _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms")
-            ?? new();
+        await JavaScript.InitializeModuleAsync();
 
         _hubConnection = new HubConnectionBuilder()
             .AddMessagePackProtocol()
@@ -34,7 +41,8 @@ public partial class Index
             .WithAutomaticReconnect()
             .Build();
 
-        _hubConnection.On<string>(HubEndpoints.RoomsUpdated, OnRoomAdded);
+        _hubConnection.On<string>(HubEventNames.RoomsUpdated, OnRoomAdded);
+        _hubConnection.On<string>(HubEventNames.UserConnected, OnUserConnected);
 
         await _hubConnection.StartAsync();
     }
@@ -45,22 +53,35 @@ public partial class Index
             return;
 
         JavaScript.LeaveRoom();
-        await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom = null);
-        if (!ActiveCamera.IsNullOrWhiteSpace())
-        {
-            JavaScript.StartVideo(ActiveCamera, "#camera");
-        }
+
+        await Task.CompletedTask;
+        //await _hubConnection.InvokeAsync(HubEventNames.RoomsUpdated, _activeRoom = null);
+        //if (!ActiveCamera.IsNullOrWhiteSpace())
+        //{
+        //    JavaScript.StartVideo(ActiveCamera, "#camera");
+        //}
     }
 
     Task OnRoomAdded(string roomName) =>
         InvokeAsync(async () =>
         {
-            _rooms = await Http.GetFromJsonAsync<List<RoomDetails>>("api/twilio/rooms")
+            AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
                 ?? new();
-            StateHasChanged();
+
+            Snackbar.Add(
+                $"🆕 {roomName} was just created.",
+                Severity.Info,
+                options => options.CloseAfterNavigation = true);
         });
 
-    protected async ValueTask TryAddRoom(object args)
+    Task OnUserConnected(string message) =>
+        InvokeAsync(() =>
+            Snackbar.Add(
+                message,
+                Severity.Info,
+                options => options.CloseAfterNavigation = true));
+
+    async ValueTask TryAddRoom(object args)
     {
         if (_roomName.IsNullOrEmpty())
         {
@@ -84,7 +105,7 @@ public partial class Index
         }
     }
 
-    protected async ValueTask<bool> TryJoinRoom(string? roomName)
+    async ValueTask<bool> TryJoinRoom(string? roomName)
     {
         if (roomName.IsNullOrWhiteSpace())
         {
@@ -100,10 +121,12 @@ public partial class Index
         var joined = JavaScript.CreateOrJoinRoom(roomName!, jwt.Token);
         if (joined && _hubConnection is not null)
         {
-            _activeRoom = roomName;
-            await _hubConnection.InvokeAsync(HubEndpoints.RoomsUpdated, _activeRoom);
+            AppState.ActiveRoomName = roomName;
+            await _hubConnection.InvokeAsync(HubEventNames.RoomsUpdated, AppState.ActiveRoomName);
         }
 
         return joined;
     }
+
+    void IDisposable.Dispose() => AppState.StateChanged -= StateHasChanged;
 }

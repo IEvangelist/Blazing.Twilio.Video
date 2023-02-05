@@ -1,0 +1,60 @@
+﻿<MudDialog DisableSidePadding="true">
+    <DialogContent>
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <div class="d-flex gap-4 align-content-center align-center">
+                <MudTextField DebounceInterval="500"
+                              Label="Room" T="string" Class="flex-grow-1"
+                              Variant="Variant.Outlined" Adornment="Adornment.End"
+                              @bind-Value="_roomName" Clearable="true"
+                              OnKeyDown=@(async (args) => await TryAddRoom(args))
+                              AdornmentIcon="@Icons.Material.Filled.MeetingRoom" />
+                <MudFab Color="Color.Secondary"
+                        Size="Size.Large" Variant="Variant.Filled"
+                        EndIcon="@Icons.Material.Filled.Add" />
+            </div>
+        </MudContainer>
+
+        @if (_isLoading)
+        {
+            <MudContainer MaxWidth="MaxWidth.Large">
+                <div class="d-flex mt-4">
+                    <MudText Typo="Typo.subtitle1" Class="flex-grow-1">Requesting rooms...</MudText>
+                    <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+                </div>
+            </MudContainer>
+        }
+        else
+        {
+            <MudContainer MaxWidth="MaxWidth.Large" Style="max-height: 400px; overflow-y: scroll">
+                <MudList Clickable="true" @bind-SelectedItem="_selectedRoom">
+                    @foreach (var room in _rooms ?? new())
+                    {
+                        if (room.IsFull)
+                        {
+                            <MudListItem Text=@($"{room.Name} (Full)") IconColor="Color.Error"
+                             Icon="@Icons.Material.Filled.PersonAddDisabled" Disabled="true" />
+                        }
+                        else if (room.Name == AppState.ActiveRoomName)
+                        {
+                            <MudListItem Text=@($"{room.Name} (In-room)") IconColor="Color.Secondary"
+                             Icon="@Icons.Material.Filled.FiberNew" Disabled="true" />
+                        }
+                        else
+                        {
+                            <MudListItem Text=@($"{room.Name} (Joinable)") IconColor="Color.Success"
+                             Icon="@Icons.Material.Filled.PersonAdd"
+                             OnClick=@(() => AppState.ActiveRoomName = room.Name) />
+                        }
+                    }
+                </MudList>
+            </MudContainer>
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Inherit"
+                   Variant="Variant.Filled" Size="Size.Large" OnClick="Ok">
+            Dismiss
+        </MudButton>
+    </DialogActions>
+</MudDialog>

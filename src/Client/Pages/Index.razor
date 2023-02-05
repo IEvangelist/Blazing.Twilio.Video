@@ -1,40 +1,15 @@
 ﻿@page "/"
 
-<MudPaper Width="300px">
-    <MudList Clickable="true" @bind-SelectedItem="@_selectedRoom" 
-        @bind-SelectedValue="@_activeRoom">
-        <MudListSubheader>
-            Room:
-            <MudChip Color="Color.Secondary">
-                @(_activeRoom ?? "default") 
-                (<sup></sup>total rooms @(_rooms?.Count.ToString() ?? "0"))
-            </MudChip>
-        </MudListSubheader>
-        @if (_rooms is { Count: > 0 })
-        {
-            foreach (var room in _rooms!)
-            {
-                <MudListItem Text="@room.Name" Value="@room.Id" />
-            }
-        }
-
-        <MudListItem Text="Sparkling Water" Value="1" />
-        <MudListItem Text="Teas">
-            <NestedList>
-                <MudListItem Text="Earl Grey" Value="2" />
-                <MudListItem Text="Matcha" Value="3" />
-                <MudListItem Text="Pu'er" Value="4" />
-            </NestedList>
-        </MudListItem>
-        <MudListItem Text="Coffees">
-            <NestedList>
-                <MudListItem Text="Irish Coffee" Value="5" />
-                <MudListItem Text="Double Espresso" Value="6" />
-                <MudListItem Text="Cafe Latte" Value="7" />
-            </NestedList>
-        </MudListItem>
-    </MudList>
-</MudPaper>
+<MudGrid Justify="Justify.Center" Class="gap-4">
+    <MudItem xs="5">
+        <MudPaper Elevation="6" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="5">
+        <MudPaper Elevation="6" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 <!--
 <div class="row h-100 pt-5">

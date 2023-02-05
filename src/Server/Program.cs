@@ -32,7 +32,7 @@ else
     app.UseHsts();
 }
 
-app.MapGroup("api/twilio").MapTwilioApi();
+app.MapTwilioApi();
 
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();

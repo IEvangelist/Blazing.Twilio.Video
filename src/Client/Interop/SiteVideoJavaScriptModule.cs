@@ -6,17 +6,19 @@ namespace Blazing.Twilio.Video.Client.Interop;
 /// <inheritdoc cref="ISiteVideoJavaScriptModule" />
 internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
 {
-    private readonly IJSInProcessRuntime _javaScript;
-    private IJSInProcessObjectReference? _siteModule;
+    readonly string _queryString = Guid.NewGuid().ToString();
+    readonly IJSInProcessRuntime _javaScript;
+
+    IJSInProcessObjectReference? _siteModule;
 
     public SiteVideoJavaScriptModule(IJSInProcessRuntime javaScript) =>
         ArgumentNullException.ThrowIfNull(_javaScript = javaScript);
 
-    /// <inheritdoc cref="ISiteVideoJavaScriptModule.InitiailizeModuleAsync" />
-    public async ValueTask InitiailizeModuleAsync() =>
+    /// <inheritdoc cref="ISiteVideoJavaScriptModule.InitializeModuleAsync" />
+    public async ValueTask InitializeModuleAsync() =>
         _siteModule ??=
             await _javaScript.InvokeAsync<IJSInProcessObjectReference>(
-                "import", "./site.js");
+                "import", $"./site.js?{_queryString}");
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.GetVideoDevicesAsync" />
     public ValueTask<Device[]> GetVideoDevicesAsync() =>
@@ -25,18 +27,22 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.StartVideo" />
     public void StartVideo(
-        string deviceId,
-        string selector) =>
-        _siteModule?.InvokeVoid(
-            "startVideo", deviceId, selector);
+        string? deviceId,
+        string? selector)
+    {
+        if (deviceId is null || selector is null) return;
+        _siteModule?.InvokeVoid("startVideo", deviceId, selector);
+    }
+
+    /// <inheritdoc cref="ISiteVideoJavaScriptModule.StopVideo" />
+    public void StopVideo() =>
+        _siteModule?.InvokeVoid("stopVideo");
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.CreateOrJoinRoom" />
     public bool CreateOrJoinRoom(
         string roomName,
         string token) =>
-        _siteModule?.Invoke<bool>(
-            "createOrJoinRoom", roomName, token)
-        ?? false;
+        _siteModule?.Invoke<bool>("createOrJoinRoom", roomName, token) ?? false;
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.LeaveRoom" />
     public void LeaveRoom() =>

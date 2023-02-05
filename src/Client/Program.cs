@@ -10,6 +10,7 @@ builder.Services.AddScoped(_ =>
     {
         BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
     });
+builder.Services.AddSingleton<AppState>();
 builder.Services.AddLocalStorageServices();
 builder.Services.AddSingleton<ISiteVideoJavaScriptModule, SiteVideoJavaScriptModule>();
 builder.Services.AddMudServices();

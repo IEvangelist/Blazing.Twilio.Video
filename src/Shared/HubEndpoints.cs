@@ -12,5 +12,4 @@ public static class HubEndpoints
     /// The hub endpoint for the notification hub (<c>Blazing.Twilio.Video.Server/Hubs/NotificationHub.cs</c>).
     /// </summary>
     public const string NotificationHub = "/notifications";
-    public const string RoomsUpdated = nameof(RoomsUpdated);
 }

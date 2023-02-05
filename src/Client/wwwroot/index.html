@@ -15,12 +15,11 @@
 </head>
 <body>
     <div id="app">
-        <div class="d-flex justify-content-center align-items-center w-100 p-4">
-            <h1 class="display-1 twilio-text">
-                <strong class="pr-4">Loading...</strong>
-                <span class="spinner-grow ml-auto" role="status" aria-hidden="true"></span>
-            </h1>
-        </div>
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
     </div>
 
     <div id="blazor-error-ui">

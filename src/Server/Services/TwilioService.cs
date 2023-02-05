@@ -3,7 +3,7 @@
 
 namespace Blazing.Twilio.Video.Server.Services;
 
-public sealed class TwilioService
+internal sealed class TwilioService
 {
     readonly TwilioSettings _twilioSettings;
 
@@ -84,7 +84,7 @@ public sealed class TwilioService
     #endregion
 }
 
-static class StringArrayExtensions
+file static class StringArrayExtensions
 {
     internal static string RandomElement(this IReadOnlyList<string> array) =>
         array[Random.Shared.Next(array.Count)];

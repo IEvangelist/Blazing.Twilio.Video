@@ -1,40 +1,44 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
-
+<MudThemeProvider @bind-IsDarkMode="@AppState.IsDarkTheme" />
+<MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.Small"
+                   CloseButton="true"
+                   DisableBackdropClick="true"
+                   Position="DialogPosition.TopCenter"
+                   CloseOnEscapeKey="false" />
+<MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h5" Class="ml-3">
-            ASP.NET Core Blazor: Twilio Programmable Video Sample App
-        </MudText>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" 
-        Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-         <MudSpacer />
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub"
-                       Color="Color.Inherit" 
-                       Href="https://github.com/IEvangelist/Blazing.Twilio.Video" />
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
-        </MudDrawerHeader>
-        <Cameras CameraChanged="OnCameraChanged" />
-    </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large">
-            @Body
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
+                      Class="d-flex gap-2 justify-center align-content-center flex-grow-1">
+            <CascadingValue Value="AppEvents">
+                @Body
+            </CascadingValue>
         </MudContainer>
     </MudMainContent>
+    <MudAppBar Bottom="true" Fixed="true" Color="Color.Secondary" Elevation="4">
+        <MudIconButton Icon="@Icons.Material.Filled.VideoCameraFront"
+                       OnClick="OpenCameraDialog"
+                       Size="Size.Large" Color="Color.Inherit" />
+        <MudIconButton Icon="@Icons.Material.Filled.RoomPreferences"
+                       OnClick="OpenRoomDialog"
+                       Size="Size.Large" Color="Color.Inherit" />
+        <MudSpacer />
+        @if (AppState.ActiveRoomName is not null)
+        {
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.ExitToApp"
+                   Color="Color.Primary" IconColor="Color.Secondary"
+                   Size="Size.Large">
+                Leave Room
+            </MudButton>
+        }
+        <MudSpacer />
+        <MudToggleIconButton @bind-Toggled="@AppState.IsDarkTheme"
+                             Size="Size.Large" Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit"
+                             ToggledIcon="@Icons.Material.Filled.Brightness1" ToggledColor="Color.Inherit" />
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub"
+                       Size="Size.Large" Color="Color.Inherit" Target="_blank"
+                       Href="https://github.com/IEvangelist/Blazing.Twilio.Video" />
+    </MudAppBar>
 </MudLayout>
-
-@code {
-    private bool _drawerOpen = false;
-
-    protected string? ActiveCamera { get; set; }
-    
-    Task OnCameraChanged(string activeCamera) =>
-        InvokeAsync(() => ActiveCamera = activeCamera);
-
-    void DrawerToggle() => _drawerOpen = _drawerOpen is false;
-}

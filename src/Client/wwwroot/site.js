@@ -34,8 +34,28 @@ export const getVideoDevices = async () => {
     return [];
 };
 
+const waitForElement = (selector) => {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                resolve(document.querySelector(selector));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+};
+
 export const startVideo = async (deviceId, selector) => {
-    const cameraContainer = document.querySelector(selector);
+    const cameraContainer = await waitForElement(selector);
     if (!cameraContainer) {
         return;
     }
@@ -43,11 +63,23 @@ export const startVideo = async (deviceId, selector) => {
     try {
         if (_videoTrack) {
             _videoTrack.detach().forEach(element => element.remove());
+            _videoTrack.stop();
         }
 
         _videoTrack = await Twilio.Video.createLocalVideoTrack({ deviceId });
         const videoEl = _videoTrack.attach();
         cameraContainer.append(videoEl);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const stopVideo = () => {
+    try {
+        if (_videoTrack) {
+            _videoTrack.detach().forEach(element => element.remove());
+            _videoTrack.stop();
+        }
     } catch (error) {
         console.log(error);
     }

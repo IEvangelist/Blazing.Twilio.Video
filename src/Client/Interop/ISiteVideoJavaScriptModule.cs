@@ -11,9 +11,9 @@ public interface ISiteVideoJavaScriptModule
     /// <summary>
     /// Starts a task that asynchronously Initializes the <c>site.js</c> module.
     /// Subsequent calls will use a cached reference to the module, and it only
-    /// is intialized once.
+    /// is initialized once.
     /// </summary>
-    ValueTask InitiailizeModuleAsync();
+    ValueTask InitializeModuleAsync();
 
     /// <summary>
     /// Creates or joins a room with the given <paramref name="roomName"/> and
@@ -41,6 +41,11 @@ public interface ISiteVideoJavaScriptModule
     /// Start video for the given <paramref name="deviceId"/> and <paramref name="selector"/>.
     /// </summary>
     /// <param name="deviceId">The device identifier to start.</param>
-    /// <param name="selector">The DOM selector for to start videon on.</param>
-    void StartVideo(string deviceId, string selector);
+    /// <param name="selector">The DOM selector for to start video on.</param>
+    void StartVideo(string? deviceId, string? selector);
+
+    /// <summary>
+    /// Stop video, detach underlying HTML <c><video></video></c> element.
+    /// </summary>
+    void StopVideo();
 }
