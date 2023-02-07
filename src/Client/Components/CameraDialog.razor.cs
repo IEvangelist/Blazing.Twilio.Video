@@ -38,11 +38,18 @@ public sealed partial class CameraDialog : IDisposable
         }
     }
 
-    void OnValueChanged(string selectedValue)
+    async Task OnValueChanged(string selectedValue)
     {
         _selectedCameraId = selectedValue;
-        JavaScript.StartVideo(
-            _selectedCameraId, ElementIds.CameraPreview);
+        if (await JavaScript.StartVideoAsync(
+            _selectedCameraId, ElementIds.CameraPreview) is not true)
+        {
+            State = RequestCameraState.Error;
+        }
+        else
+        {
+            AppState.CameraStatus = CameraStatus.Previewing;
+        }
     }
 
     void SaveCameraSelection()

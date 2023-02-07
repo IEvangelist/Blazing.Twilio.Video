@@ -1,4 +1,5 @@
 ﻿let _videoTrack = null;
+let _audioTrack = null;
 let _activeRoom = null;
 let _participants = new Map();
 let _dominantSpeaker = null;
@@ -57,29 +58,32 @@ const waitForElement = (selector) => {
 export const startVideo = async (deviceId, selector) => {
     const cameraContainer = await waitForElement(selector);
     if (!cameraContainer) {
-        return;
+        return false;
     }
 
     try {
-        if (_videoTrack) {
-            _videoTrack.detach().forEach(element => element.remove());
-            _videoTrack.stop();
-        }
+        resetExistingTrack({
+            track: _videoTrack,
+            nullOut: () => _videoTrack = null
+        });
 
         _videoTrack = await Twilio.Video.createLocalVideoTrack({ deviceId });
         const videoEl = _videoTrack.attach();
         cameraContainer.append(videoEl);
     } catch (error) {
         console.log(error);
+        return false;
     }
+
+    return true;
 };
 
 export const stopVideo = () => {
     try {
-        if (_videoTrack) {
-            _videoTrack.detach().forEach(element => element.remove());
-            _videoTrack.stop();
-        }
+        resetExistingTrack({
+            track: _videoTrack,
+            nullOut: () => _videoTrack = null
+        });
     } catch (error) {
         console.log(error);
     }
@@ -95,8 +99,13 @@ export const createOrJoinRoom = async (roomName, token) => {
             await startVideo(localStorage['camera-device-id'], 'participant-1');
         }
 
-        const audioTrack = await Twilio.Video.createLocalAudioTrack();
-        const tracks = [audioTrack, _videoTrack];
+        resetExistingTrack({
+            track: _audioTrack,
+            nullOut: () => _audioTrack = null
+        });
+
+        _audioTrack = await Twilio.Video.createLocalAudioTrack();
+        const tracks = [_audioTrack, _videoTrack];
         _activeRoom = await Twilio.Video.connect(
             token, {
             name: roomName,
@@ -119,6 +128,20 @@ export const createOrJoinRoom = async (roomName, token) => {
     }
 
     return !!_activeRoom;
+};
+
+const resetExistingTrack = ({
+    track = null,
+    nullOut = () => track = null
+}) => {
+    if (track) {
+        track.detach().forEach(child => child.remove());
+        track.stop();
+        
+        if (nullOut) {
+            nullOut();
+        }
+    }
 };
 
 const initialize = (participants) => {

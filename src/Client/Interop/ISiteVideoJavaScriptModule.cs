@@ -38,11 +38,13 @@ public interface ISiteVideoJavaScriptModule
     void LeaveRoom();
 
     /// <summary>
-    /// Start video for the given <paramref name="deviceId"/> and <paramref name="selector"/>.
+    /// Asynchronously starts video for the given <paramref name="deviceId"/> and <paramref name="selector"/>.
     /// </summary>
     /// <param name="deviceId">The device identifier to start.</param>
     /// <param name="selector">The DOM selector for to start video on.</param>
-    void StartVideo(string? deviceId, string? selector);
+    /// <returns>A <see cref="ValueTask{TResult}"/> where <c>TResult</c>
+    /// is <see cref="bool"/> (<c>true</c> or <c>false</c>).</returns>
+    ValueTask<bool> StartVideoAsync(string? deviceId, string? selector);
 
     /// <summary>
     /// Stop video, detach underlying HTML <c><video></video></c> element.

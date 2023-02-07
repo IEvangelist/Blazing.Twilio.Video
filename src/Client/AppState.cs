@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using static MudBlazor.CategoryTypes;
+
 namespace Blazing.Twilio.Video.Client;
 
 /// <summary>
@@ -14,6 +16,7 @@ public sealed class AppState
     bool _isDarkTheme;
     string? _activeRoomName;
     HashSet<RoomDetails>? _rooms;
+    CameraStatus _cameraStatus;
 
     /// <summary>
     /// An event that is fired when the app state has changed.
@@ -34,6 +37,46 @@ public sealed class AppState
             if (_selectedCameraId != value)
             {
                 _storage.SetItem(StorageKeys.CameraDeviceId, _selectedCameraId = value);
+                StateChanged?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the current camera status:
+    /// <list type="bullet"">
+    /// <listheader>
+    /// <term>Value</term>
+    /// <description>The question that is answered by evaluating the <c>Value</c>.</description>
+    /// </listheader>
+    /// <item>
+    /// <term>
+    /// <c><see cref="CameraStatus.Idle"/></c>
+    /// </term>
+    /// <description>is the camera idle?</description>
+    /// </item>
+    /// <item>
+    /// <term>
+    /// <c><see cref="CameraStatus.Previewing"/></c>
+    /// </term>
+    /// <description>is the camera being previewed?</description>
+    /// </item>
+    /// <item>
+    /// <term>
+    /// <c><see cref="CameraStatus.InCall"/></c>
+    /// </term>
+    /// <description>is the camera in a call?</description>
+    /// </item>
+    /// </list>
+    /// </summary>
+    public CameraStatus CameraStatus
+    {
+        get => _cameraStatus;
+        set
+        {
+            if (_cameraStatus != value)
+            {
+                _cameraStatus = value;
                 StateChanged?.Invoke();
             }
         }
