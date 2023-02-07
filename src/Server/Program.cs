@@ -1,4 +1,4 @@
-// Copyright (c) David Pine. All rights reserved.
+﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,13 +36,15 @@ app.MapTwilioApi();
 
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    HttpsCompression = HttpsCompressionMode.Compress,
-    OnPrepareResponse = context =>
-        context.Context.Response.Headers[HeaderNames.CacheControl] =
-            $"public,max-age={86_400}"
-});
+app.UseStaticFiles(app.Environment.IsDevelopment()
+    ? new()
+    : new StaticFileOptions
+    {
+        HttpsCompression = HttpsCompressionMode.Compress,
+        OnPrepareResponse = context =>
+            context.Context.Response.Headers[HeaderNames.CacheControl] =
+                $"public,max-age={86_400}"
+    });
 app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();

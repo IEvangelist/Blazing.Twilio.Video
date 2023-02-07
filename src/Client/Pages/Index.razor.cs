@@ -16,23 +16,37 @@ public sealed partial class Index : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        AppState.StateChanged += StateHasChanged;
-        
+        AppState.StateChanged += OnStateHasChanged;
+
         await JavaScript.InitializeModuleAsync();
+    }
+
+    void OnStateHasChanged(string appStatePropertyName)
+    {
+        var value = appStatePropertyName switch
+        {
+            nameof(AppState.SelectedCameraId) => AppState.SelectedCameraId,
+            nameof(AppState.CameraStatus) => AppState.CameraStatus.ToString(),
+            nameof(AppState.Rooms) => $"{AppState.Rooms?.Count ?? 0} (room count)",
+            nameof(AppState.IsDarkTheme) => AppState.IsDarkTheme.ToString(),
+            nameof(AppState.ActiveRoomName) => AppState.ActiveRoomName,
+            _ => "Unknown"
+        };
+
+        Console.WriteLine(
+            $"Changed: AppState.{appStatePropertyName} = {value}");
     }
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
 
-        if (AppState.SelectedCameraId is { } deviceId)
+        if (AppState.SelectedCameraId is { } deviceId &&
+            AppState is { CameraStatus: CameraStatus.Idle })
         {
-            if (await JavaScript.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
-            {
-                AppState.CameraStatus = CameraStatus.Previewing;
-            }
+            await JavaScript.StartVideoAsync(deviceId, ElementIds.ParticipantOne);
         }
     }
 
-    void IDisposable.Dispose() => AppState.StateChanged -= StateHasChanged;
+    void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;
 }

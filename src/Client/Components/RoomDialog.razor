@@ -27,7 +27,7 @@
         {
             <MudContainer MaxWidth="MaxWidth.Large" Style="max-height: 400px; overflow-y: scroll">
                 <MudList Clickable="true" @bind-SelectedItem="_selectedRoom">
-                    @foreach (var room in _rooms ?? new())
+                    @foreach (var room in AppState.Rooms ?? new())
                     {
                         if (room.IsFull)
                         {

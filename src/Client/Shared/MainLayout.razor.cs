@@ -44,10 +44,14 @@ public partial class MainLayout
         if (_hubConnection is not null &&
             eventMessage.MessageType is MessageType.RoomCreatedOrJoined)
         {
-            JavaScript.CreateOrJoinRoom(eventMessage.Value, eventMessage.TwilioToken!);
+            await JavaScript.CreateOrJoinRoomAsync(
+                eventMessage.Value, eventMessage.TwilioToken!);
 
-            AppState.ActiveRoomName = eventMessage.Value;
-            await _hubConnection.InvokeAsync(HubEventNames.RoomsUpdated, AppState.ActiveRoomName);
+            await _hubConnection.InvokeAsync(
+                HubEventNames.RoomsUpdated,
+                AppState.ActiveRoomName = eventMessage.Value);
+
+            return;
         }
 
         if (eventMessage.MessageType is MessageType.CameraSelected)
@@ -57,19 +61,19 @@ public partial class MainLayout
     }
 
     Task OnRoomAdded(string roomName) =>
-     InvokeAsync(async () =>
-     {
-         AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
-             ?? new();
+        InvokeAsync(async () =>
+        {
+            AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
+                ?? new();
 
-         Snackbar.Add(
-             $"🆕 {roomName} was just created.",
-             Severity.Error,
-             options =>
-             {
-                 options.CloseAfterNavigation = true;
-                 options.IconSize = Size.Large;
-             });
+            Snackbar.Add(
+                $"🆕 {roomName} was just created.",
+                Severity.Error,
+                options =>
+                {
+                    options.CloseAfterNavigation = true;
+                    options.IconSize = Size.Large;
+                });
      });
 
     Task OnUserConnected(string message) =>

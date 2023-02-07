@@ -1,13 +1,37 @@
 ﻿@page "/"
 
 <MudGrid Justify="Justify.Center" Class="gap-4">
-    <MudItem xs="5" Class="vh-80">
-        <MudPaper Elevation="25" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
+    <MudItem xs="10">
+        <MudPaper Elevation="10" Class="pa-4">
+            <MudGrid Justify="Justify.Center" Class="gap-4 align-content-center justify-center">
+                <MudItem xs="1" Class="d-flex pb-2">
+                    <MudLink Href="https://learn.microsoft.com/aspnet/core/blazor" Target="_blank" Class="d-flex">
+                        <MudImage Src="/images/blazor.svg" Alt="Blazor logo" Elevation="0"
+                                  Width="165" ObjectPosition="ObjectPosition.Center"
+                                  ObjectFit="ObjectFit.Contain" Class="pb-4 pr-4" />
+                    </MudLink>                    
+                </MudItem>
+                <MudItem xs="1" Class="d-flex">
+                    <MudIcon Icon="@Icons.Material.Filled.Favorite"
+                             Size="Size.Large" Style="margin: auto" />
+                </MudItem>
+                <MudItem xs="1" Class="d-flex">
+                    <MudLink Href="https://www.twilio.com/docs/video" Target="_blank" Class="d-flex">
+                        <MudImage Src="/images/twilio.svg" Alt="Twilio logo" Elevation="0"
+                                  Width="110" ObjectPosition="ObjectPosition.Center"
+                                  ObjectFit="ObjectFit.Contain" />
+                    </MudLink>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="5" Class="min-vh-55">
+        <MudPaper Elevation="10" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
             <div id="participant-1"></div>
         </MudPaper>
     </MudItem>
-    <MudItem xs="5" Class="vh-80">
-        <MudPaper Elevation="25" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
+    <MudItem xs="5" Class="min-vh-55">
+        <MudPaper Elevation="10" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
             <div id="participant-2"></div>
         </MudPaper>
     </MudItem>

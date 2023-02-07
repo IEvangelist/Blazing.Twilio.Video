@@ -170,8 +170,8 @@ app {
         content: "Loading...🤓";
     }
 
-.vh-80 {
-    height: 80vh;
+.min-vh-55 {
+    min-height: 55vh;
 }
 
 video {
@@ -182,4 +182,8 @@ video {
 
 .snacks {
     font-size: 1.5rem;
+}
+
+.mud-link:hover {
+    filter: brightness(1.5);
 }

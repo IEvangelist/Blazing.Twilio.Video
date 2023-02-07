@@ -46,10 +46,6 @@ public sealed partial class CameraDialog : IDisposable
         {
             State = RequestCameraState.Error;
         }
-        else
-        {
-            AppState.CameraStatus = CameraStatus.Previewing;
-        }
     }
 
     void SaveCameraSelection()

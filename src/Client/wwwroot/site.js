@@ -125,6 +125,7 @@ export const createOrJoinRoom = async (roomName, token) => {
         }
     } catch (error) {
         console.error(`Unable to connect to Room: ${error.message}`);
+        return false;
     }
 
     return !!_activeRoom;

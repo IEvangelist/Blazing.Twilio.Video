@@ -1,12 +1,10 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using static MudBlazor.CategoryTypes;
-
 namespace Blazing.Twilio.Video.Client;
 
 /// <summary>
-/// An app state class — some properties are persisted to <c>window.localStorage</c>.
+/// An app state class ? some properties are persisted to <c>window.localStorage</c>.
 /// </summary>
 public sealed class AppState
 {
@@ -21,7 +19,7 @@ public sealed class AppState
     /// <summary>
     /// An event that is fired when the app state has changed.
     /// </summary>
-    public event Action? StateChanged;
+    public event Action<string>? StateChanged;
 
     public AppState(ILocalStorageService storage) => _storage = storage;
 
@@ -37,36 +35,17 @@ public sealed class AppState
             if (_selectedCameraId != value)
             {
                 _storage.SetItem(StorageKeys.CameraDeviceId, _selectedCameraId = value);
-                StateChanged?.Invoke();
+                StateChanged?.Invoke(nameof(SelectedCameraId));
             }
         }
     }
 
     /// <summary>
     /// Gets or sets the current camera status:
-    /// <list type="bullet"">
-    /// <listheader>
-    /// <term>Value</term>
-    /// <description>The question that is answered by evaluating the <c>Value</c>.</description>
-    /// </listheader>
-    /// <item>
-    /// <term>
-    /// <c><see cref="CameraStatus.Idle"/></c>
-    /// </term>
-    /// <description>is the camera idle?</description>
-    /// </item>
-    /// <item>
-    /// <term>
-    /// <c><see cref="CameraStatus.Previewing"/></c>
-    /// </term>
-    /// <description>is the camera being previewed?</description>
-    /// </item>
-    /// <item>
-    /// <term>
-    /// <c><see cref="CameraStatus.InCall"/></c>
-    /// </term>
-    /// <description>is the camera in a call?</description>
-    /// </item>
+    /// <list type="bullet">
+    /// <item><c><see cref="CameraStatus.Idle"/></c>: (default) camera status is idle.</item>
+    /// <item><c><see cref="CameraStatus.Previewing"/></c>: camera is being previewed.</item>
+    /// <item><c><see cref="CameraStatus.InCall"/></c>: camera is being used in a call.</item>
     /// </list>
     /// </summary>
     public CameraStatus CameraStatus
@@ -77,7 +56,7 @@ public sealed class AppState
             if (_cameraStatus != value)
             {
                 _cameraStatus = value;
-                StateChanged?.Invoke();
+                StateChanged?.Invoke(nameof(CameraStatus));
             }
         }
     }
@@ -94,7 +73,7 @@ public sealed class AppState
             if (_isDarkTheme != value)
             {
                 _storage.SetItem(StorageKeys.PrefersDarkTheme, _isDarkTheme = value);
-                StateChanged?.Invoke();
+                StateChanged?.Invoke(nameof(IsDarkTheme));
             }
         }
     }
@@ -111,7 +90,7 @@ public sealed class AppState
             if (_activeRoomName != value)
             {
                 _activeRoomName = value;
-                StateChanged?.Invoke();
+                StateChanged?.Invoke(nameof(ActiveRoomName));
             }
         }
     }
@@ -127,7 +106,7 @@ public sealed class AppState
         set
         {
             _rooms = value;
-            StateChanged?.Invoke();
+            StateChanged?.Invoke(nameof(Rooms));
         }
     }
 }

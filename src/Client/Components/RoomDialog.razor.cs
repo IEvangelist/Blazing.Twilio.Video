@@ -3,11 +3,10 @@
 
 namespace Blazing.Twilio.Video.Client.Components;
 
-public sealed partial class RoomDialog
+public sealed partial class RoomDialog : IDisposable
 {
     bool _isLoading = true;
     string? _roomName;
-    HashSet<RoomDetails> _rooms = new();
     MudListItem? _selectedRoom;
 
     [Inject]
@@ -24,13 +23,22 @@ public sealed partial class RoomDialog
 
     protected override async Task OnInitializedAsync()
     {
-        _rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
+        AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
             ?? new();
+        AppState.StateChanged += OnStateHasChanged;
 
         _isLoading = false;
     }
 
     void Ok() => MudDialog.Close(DialogResult.Ok(true));
+
+    void OnStateHasChanged(string appStatePropertyName)
+    {
+        if (appStatePropertyName is nameof(AppState.Rooms))
+        {
+            StateHasChanged();
+        }
+    }
 
     async ValueTask TryAddRoom(object args)
     {
@@ -76,4 +84,6 @@ public sealed partial class RoomDialog
 
         return true;
     }
+
+    void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;
 }

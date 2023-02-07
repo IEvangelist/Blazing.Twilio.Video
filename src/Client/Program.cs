@@ -1,4 +1,4 @@
-// Copyright (c) David Pine. All rights reserved.
+﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
