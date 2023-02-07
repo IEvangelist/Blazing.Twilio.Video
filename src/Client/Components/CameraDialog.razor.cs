@@ -42,7 +42,7 @@ public sealed partial class CameraDialog : IDisposable
     {
         _selectedCameraId = selectedValue;
         JavaScript.StartVideo(
-            _selectedCameraId, "#camera-preview");
+            _selectedCameraId, ElementIds.CameraPreview);
     }
 
     void SaveCameraSelection()
