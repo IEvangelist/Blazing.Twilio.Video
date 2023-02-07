@@ -170,7 +170,7 @@ const attachTrack = (track, isLocal) => {
         const audioOrVideo = track.attach();
         audioOrVideo.id = track.sid;
 
-        document.getElementById(`participant-${isLocal ? 1 : 2}`)
+        document.getElementById(`participant-${isLocal ? '1' : '2'}`)
             .appendChild(audioOrVideo);
     }
 };
@@ -178,19 +178,7 @@ const attachTrack = (track, isLocal) => {
 const detachTrack = (track) => {
     if (this.isMemberDefined(track, 'detach')) {
         track.detach()
-            .forEach(el => {
-                if ('video' === el.tagName.toLowerCase()) {
-                    const parent = el.parentElement;
-                    if (parent && parent.id !== 'camera') {
-                        const grandParent = parent.parentElement;
-                        if (grandParent) {
-                            grandParent.remove();
-                        }
-                    }
-                } else {
-                    el.remove()
-                }
-            });
+            .forEach(el => el.remove());
     }
 };
 

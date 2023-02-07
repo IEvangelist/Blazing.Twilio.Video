@@ -9,7 +9,8 @@
                               AdornmentIcon="@Icons.Material.Filled.MeetingRoom" />
                 <MudFab Color="Color.Secondary"
                         Size="Size.Large" Variant="Variant.Filled"
-                        EndIcon="@Icons.Material.Filled.Add" />
+                        EndIcon="@Icons.Material.Filled.Add"
+                        OnClick=@(async (args) => await TryAddRoom(args)) />
             </div>
         </MudContainer>
 

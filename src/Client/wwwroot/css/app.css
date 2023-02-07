@@ -132,25 +132,25 @@ app {
     display: block;
     width: 10rem;
     height: 10rem;
-    margin: 20vh auto 1rem auto;
+    margin: 10vh auto 2rem auto;
 }
 
     .loading-progress circle {
         fill: none;
         stroke: #e0e0e0;
-        stroke-width: 0.75rem;
+        stroke-width: 1rem;
         transform-origin: 50% 50%;
         transform: rotate(-90deg);
     }
 
         .loading-progress circle:last-child {
-            stroke: #1b6ec2;
+            stroke: #ff4081ff;
             stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
             transition: stroke-dasharray 0.05s ease-in-out;
         }
 
 .loading-progress-text {
-    position: absolute;
+    margin: auto;
     text-align: center;
     font-weight: bold;
     font-family: monospace;
@@ -158,9 +158,21 @@ app {
     inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
 }
 
-    .loading-progress-text:after {
-        content: var(--blazor-load-percentage-text, "Loading");
+    .loading-progress-text.top {
+        margin-top: 10vh;
     }
+
+    .loading-progress-text.top:after {
+        content: var(--blazor-load-percentage-text);
+    }
+
+    .loading-progress-text.bottom:after {
+        content: "Loading...🤓";
+    }
+
+.vh-80 {
+    height: 80vh;
+}
 
 video {
     height: auto;

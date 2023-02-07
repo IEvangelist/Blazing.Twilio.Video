@@ -17,8 +17,12 @@ public sealed partial class Index : IDisposable
     protected override async Task OnInitializedAsync()
     {
         AppState.StateChanged += StateHasChanged;
-
         await JavaScript.InitializeModuleAsync();
+
+        if (AppState.SelectedCameraId is { } deviceId)
+        {
+            JavaScript.StartVideo(deviceId, ElementIds.ParticipantOne);
+        }
     }
 
     void IDisposable.Dispose() => AppState.StateChanged -= StateHasChanged;

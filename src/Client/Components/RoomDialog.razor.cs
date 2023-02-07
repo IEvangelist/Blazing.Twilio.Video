@@ -32,14 +32,21 @@ public sealed partial class RoomDialog
 
     void Ok() => MudDialog.Close(DialogResult.Ok(true));
 
-    async ValueTask TryAddRoom(KeyboardEventArgs args)
+    async ValueTask TryAddRoom(object args)
     {
         if (_roomName.IsNullOrEmpty())
         {
             return;
         }
 
-        if (args.Key is "Enter")
+        var takeAction = args switch
+        {
+            KeyboardEventArgs keyboard when keyboard.Key is "Enter" => true,
+            MouseEventArgs => true,
+            _ => false
+        };
+
+        if (takeAction)
         {
             var addedOrJoined = await TryJoinRoom(_roomName);
             if (addedOrJoined)
