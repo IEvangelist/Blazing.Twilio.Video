@@ -14,5 +14,5 @@ public sealed class NotificationHub : Hub
 
     /// <inheritdoc cref="Hub.OnConnectedAsync" />
     public override Task OnConnectedAsync() =>
-        Clients.All.SendAsync(HubEventNames.UserConnected, "New user connected...");
+        Clients.All.SendAsync(HubEventNames.UserConnected, "Hi friends...");
 }

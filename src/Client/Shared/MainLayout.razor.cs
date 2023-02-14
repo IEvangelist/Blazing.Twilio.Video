@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Extensions.Logging;
+
 namespace Blazing.Twilio.Video.Client.Shared;
 
 public partial class MainLayout
@@ -11,7 +13,8 @@ public partial class MainLayout
     [Inject] public required ISiteVideoJavaScriptModule JavaScript { get; set; }
     [Inject] public required IDialogService Dialog { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
-
+    [Inject] public required ILogger<MainLayout> Logger { get; set; }
+    
     AppEventSubject AppEvents { get; set; }
 
     HubConnection? _hubConnection;
@@ -71,8 +74,11 @@ public partial class MainLayout
             AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
                 ?? new();
 
+            const string template = LogMessageTemplates.OnRoomAdded;
+
+            Logger.LogInformation(template, roomName);
             Snackbar.Add(
-                $"🆕 {roomName} was just created.",
+                template.Replace("{RoomName}", roomName),
                 Severity.Error,
                 options =>
                 {
@@ -81,16 +87,23 @@ public partial class MainLayout
                 });
         });
 
-    Task OnUserConnected(string message) =>
-        InvokeAsync(() =>
+    Task OnUserConnected(string message)
+    {
+        return InvokeAsync(() =>
+        {
+            const string template = LogMessageTemplates.OnUserConnected;
+
+            Logger.LogInformation(LogMessageTemplates.OnUserConnected, message);
             Snackbar.Add(
-                message,
+                template.Replace("{Message}", message),
                 Severity.Error,
                 options =>
                 {
                     options.CloseAfterNavigation = true;
                     options.IconSize = Size.Large;
-                }));
+                });
+        });
+    }
 
     Task OpenCameraDialog() =>
         ShowDialogAsync<CameraDialog>("Camera Preferences");
@@ -100,14 +113,32 @@ public partial class MainLayout
 
     async Task ShowDialogAsync<TDialog>(string title) where TDialog : ComponentBase
     {
-        var reference = await Dialog.ShowAsync<TDialog>(title, new DialogParameters()
-        {
-            [nameof(AppEvents)] = AppEvents
-        });
+        var dialogReference =
+            await Dialog.ShowAsync<TDialog>(title, new DialogParameters()
+            {
+                [nameof(AppEvents)] = AppEvents
+            });
 
-        if (await reference.Result is { Canceled: false })
+        if (await dialogReference.Result is { Canceled: false })
         {
             StateHasChanged();
         }
     }
+}
+
+file static class LogMessageTemplates
+{
+    /// <summary>
+    /// If not passed as the <c>message</c> argument of
+    /// the <see cref="ILogger{TCategoryName}.LogInformation"/> method,
+    /// call <c>LogMessageTemplates.OnRoomAdded.Replace("{RoomName}", roomName);</c>
+    /// </summary>
+    internal const string OnRoomAdded = "🆕 {RoomName} was just created.";
+
+    /// <summary>
+    /// If not passed as the <c>message</c> argument of
+    /// the <see cref="ILogger{TCategoryName}.LogInformation"/> method,
+    /// call <c>LogMessageTemplates.OnUserConnected.Replace("{Message}", message);</c>
+    /// </summary>
+    internal const string OnUserConnected = "⚠️ {Message}";
 }

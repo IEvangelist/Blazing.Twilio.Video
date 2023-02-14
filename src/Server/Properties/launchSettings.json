@@ -1,9 +1,10 @@
 {
     "profiles": {
-      "Blazing.Twilio.Video.Server": {
+      "https": {
         "commandName": "Project",
         "dotnetRunMessages": true,
         "launchBrowser": true,
+        "devTunnelEnabled": true,
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
         "applicationUrl": "https://localhost:7181;http://localhost:5181",
         "environmentVariables": {

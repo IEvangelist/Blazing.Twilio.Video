@@ -127,7 +127,8 @@ export const createOrJoinRoom = async (roomName, token) => {
                 .on('dominantSpeakerChanged', dominantSpeaker => loudest(dominantSpeaker));
         }
     } catch (error) {
-        console.error(`Unable to connect to Room: ${error.message}`);
+        const message = JSON.stringify(error, Object.getOwnPropertyNames(error));
+        console.error(`Unable to connect to Room: ${message}`);
         return false;
     }
 

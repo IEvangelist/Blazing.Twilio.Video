@@ -33,7 +33,9 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
             await _javaScript.InvokeAsync<IJSInProcessObjectReference>(
                 "import", $"./site.js?{_cacheBust}");
 
-        _logger.LogInformation("Initialized site.js (1st call: {First})", uninitialized);
+        var emoji = uninitialized ? "1️⃣" : "2️⃣";
+        _logger.LogInformation(
+            "{Emoji} Initialized site.js (1st call: {First})", emoji, uninitialized);
     }
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.GetVideoDevicesAsync" />
@@ -47,8 +49,9 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
         string? selector,
         CancellationToken token)
     {
-        _logger.LogInformation("Acquiring exclusive start video lock.");
+        _logger.LogInformation("🤓 Requesting exclusive start video lock...");
         await _lock.WaitAsync(token);
+        _logger.LogInformation("🎯 Acquired: (and temporarily using an exclusive 'start video' lock).");
 
         try
         {
@@ -64,7 +67,7 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
 
                 if (videoStarted)
                 {
-                    _logger.LogInformation("Video started.");
+                    _logger.LogInformation("Video started (using 📹 ID: {Cam}).", deviceId);
                     _appState.CameraStatus = selector switch
                     {
                         ElementIds.CameraPreview => CameraStatus.Previewing,
@@ -75,20 +78,23 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
                 }
                 else
                 {
-                    _logger.LogInformation("Unable to start video. {Error}", errorMessage);
+                    _logger.LogInformation(
+                        "😥 Unable to start video. {Error}", errorMessage ?? "Unknown JS error.");
                     return false;
                 }
             }
             else
             {
-                _logger.LogInformation("Unable to start video.");
+                _logger.LogInformation(
+                    "🤖 Unable to start video (camera state: {State}.", _appState.CameraStatus);
                 return false;
             }
         }
         finally
         {
-            _logger.LogInformation("Releasing exclusive start video lock.");
+            _logger.LogInformation("✅ Releasing exclusive 'start video' lock.");
             _lock.Release();
+            _logger.LogInformation("🔓 Released lock (camera state: {State}).", _appState.CameraStatus);
         }
     }
 
@@ -97,12 +103,12 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
     {
         if (_appState is { CameraStatus: CameraStatus.Idle })
         {
-            _logger.LogInformation("Unable to stop video.");
+            _logger.LogInformation("Unable to stop video as it's not currently running (Idle).");
             return;
         }
 
-        _logger.LogInformation("Stopped video.");
         _siteModule?.InvokeVoid("stopVideo");
+        _logger.LogInformation("‼️ Stopped video... {State}", _appState.CameraStatus);
     }
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.CreateOrJoinRoomAsync" />
@@ -115,7 +121,7 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
             ?? ValueTask.FromResult(false));
 
         _logger.LogInformation(
-            "Created or joined room '{Room}': {Val}.", roomName, createdOrJoinedRoom);
+            "✅ Created or joined room '{Room}': {Val}.", roomName, createdOrJoinedRoom);
 
         _appState.CameraStatus =
             createdOrJoinedRoom ? CameraStatus.InCall : CameraStatus.Previewing;
@@ -128,11 +134,12 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
     {
         if (_appState is { CameraStatus: CameraStatus.Idle })
         {
-            _logger.LogInformation("Unable to leave room.");
+            _logger.LogInformation("⁉️ Unable to leave room (already idle).");
             return;
         }
 
-        _logger.LogInformation("Left room.");
+        _logger.LogInformation("🤗 Leaving room (camera state: {State}.", _appState.CameraStatus);
         _siteModule?.InvokeVoid("leaveRoom");
+        _logger.LogInformation("👋🏽 Left room (camera state: {State}.", _appState.CameraStatus);
     }
 }

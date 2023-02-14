@@ -11,6 +11,9 @@ public sealed partial class Index : IDisposable
     [Inject]
     public required AppState AppState { get; set; }
 
+    [Inject]
+    public required ILogger<Index> Logger { get; set; }
+
     [CascadingParameter]
     public required AppEventSubject AppEvents { get; set; }
 
@@ -45,8 +48,8 @@ public sealed partial class Index : IDisposable
             _ => "Unknown"
         };
 
-        Console.WriteLine(
-            $"Changed: AppState.{appStatePropertyName} = {value}");
+        Logger.LogInformation("⚙️ Changed: AppState.{AppStatePropertyName} = {Value}",
+            appStatePropertyName, value);
     }
 
     void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;
