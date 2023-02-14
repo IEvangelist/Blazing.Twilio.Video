@@ -58,7 +58,10 @@ const waitForElement = (selector) => {
 export const startVideo = async (deviceId, selector) => {
     const cameraContainer = await waitForElement(selector);
     if (!cameraContainer) {
-        return false;
+        return {
+            Success: false,
+            ErrorMessage: `Unable to get HTML element matching ${selector}`
+        };
     }
 
     try {
@@ -72,10 +75,10 @@ export const startVideo = async (deviceId, selector) => {
         cameraContainer.append(videoEl);
     } catch (error) {
         console.log(error);
-        return false;
+        return { Success: false, ErrorMessage: JSON.stringify(error) };
     }
 
-    return true;
+    return { Success: true, ErrorMessage: null };
 };
 
 export const stopVideo = () => {

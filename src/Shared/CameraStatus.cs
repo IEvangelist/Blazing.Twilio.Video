@@ -15,6 +15,9 @@ public enum CameraStatus
     /// feed, smile you're on camera.</summary>
     Previewing,
 
+    /// <summary>Requesting a preview of the camera.</summary>
+    RequestingPreview,
+
     /// <summary>The camera status when in a call.</summary>
     InCall
 };

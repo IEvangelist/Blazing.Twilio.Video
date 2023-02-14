@@ -38,14 +38,19 @@ public sealed partial class CameraDialog : IDisposable
         }
     }
 
-    async Task OnValueChanged(string selectedValue)
+    void OnValueChanged(string selectedValue)
     {
         _selectedCameraId = selectedValue;
-        if (await JavaScript.StartVideoAsync(
-            _selectedCameraId, ElementIds.CameraPreview) is not true)
+
+        if (AppState is not { CameraStatus: CameraStatus.Idle })
         {
-            State = RequestCameraState.Error;
+            return;
         }
+
+        AppState.CameraStatus = CameraStatus.RequestingPreview;
+        AppEvents.TriggerAppEvent(new AppEventMessage(
+            Value: _selectedCameraId!,
+            MessageType: MessageType.CameraSelected));
     }
 
     void SaveCameraSelection()
@@ -55,7 +60,6 @@ public sealed partial class CameraDialog : IDisposable
             MessageType: MessageType.CameraSelected));
 
         MudDialog.Close(DialogResult.Ok(true));
-        JavaScript.StopVideo();
     }
 
     void Cancel()

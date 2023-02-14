@@ -21,6 +21,18 @@ public sealed partial class Index : IDisposable
         await JavaScript.InitializeModuleAsync();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (AppState.SelectedCameraId is { } deviceId)
+        {
+            var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
+                ? ElementIds.CameraPreview
+                : ElementIds.ParticipantOne;
+
+            await JavaScript.StartVideoAsync(deviceId, selector);
+        }
+    }
+
     void OnStateHasChanged(string appStatePropertyName)
     {
         var value = appStatePropertyName switch
@@ -35,17 +47,6 @@ public sealed partial class Index : IDisposable
 
         Console.WriteLine(
             $"Changed: AppState.{appStatePropertyName} = {value}");
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-
-        if (AppState.SelectedCameraId is { } deviceId &&
-            AppState is { CameraStatus: CameraStatus.Idle })
-        {
-            await JavaScript.StartVideoAsync(deviceId, ElementIds.ParticipantOne);
-        }
     }
 
     void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;

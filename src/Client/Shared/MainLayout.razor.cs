@@ -54,9 +54,14 @@ public partial class MainLayout
             return;
         }
 
-        if (eventMessage.MessageType is MessageType.CameraSelected)
+        if (eventMessage.MessageType is MessageType.CameraSelected &&
+            (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
         {
-            AppState.SelectedCameraId = eventMessage.Value;
+            var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
+                ? ElementIds.CameraPreview
+                : ElementIds.ParticipantOne;
+
+            await JavaScript.StartVideoAsync(deviceId, selector);
         }
     }
 
@@ -74,7 +79,7 @@ public partial class MainLayout
                     options.CloseAfterNavigation = true;
                     options.IconSize = Size.Large;
                 });
-     });
+        });
 
     Task OnUserConnected(string message) =>
         InvokeAsync(() =>
@@ -87,15 +92,22 @@ public partial class MainLayout
                     options.IconSize = Size.Large;
                 }));
 
-    void OpenCameraDialog() =>
-        Dialog.Show<CameraDialog>("Camera Preferences", new DialogParameters()
+    Task OpenCameraDialog() =>
+        ShowDialogAsync<CameraDialog>("Camera Preferences");
+
+    Task OpenRoomDialog() =>
+        ShowDialogAsync<RoomDialog>("Available Rooms");
+
+    async Task ShowDialogAsync<TDialog>(string title) where TDialog : ComponentBase
+    {
+        var reference = await Dialog.ShowAsync<TDialog>(title, new DialogParameters()
         {
-            ["AppEvents"] = AppEvents
+            [nameof(AppEvents)] = AppEvents
         });
 
-    void OpenRoomDialog() =>
-        Dialog.Show<RoomDialog>("Available Rooms", new DialogParameters()
+        if (await reference.Result is { Canceled: false })
         {
-            ["AppEvents"] = AppEvents
-        });
+            StateHasChanged();
+        }
+    }
 }

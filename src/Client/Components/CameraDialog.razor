@@ -12,10 +12,10 @@
                 if (CameraDevicesFound)
                 {
                     <MudSelect T="string" Label="Camera" AdornmentColor="Color.Secondary"
-                   AutoFocus="true" Strict="true" Variant="Variant.Outlined"
-                   AnchorOrigin="Origin.BottomCenter" ReadOnly="IsRequesting"
-                   TextChanged="OnValueChanged"
-                   OpenIcon="@Icons.Material.Filled.PhotoCameraFront" @bind-Value="@_selectedCameraId">
+                       AutoFocus="true" Strict="true" Variant="Variant.Outlined"
+                       AnchorOrigin="Origin.BottomCenter" ReadOnly="IsRequesting"
+                       TextChanged="OnValueChanged"
+                       OpenIcon="@Icons.Material.Filled.PhotoCameraFront" @bind-Value="@_selectedCameraId">
                         @foreach (var device in Devices!)
                         {
                             <MudSelectItem T="string" Value="@device.DeviceId">
