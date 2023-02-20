@@ -34,8 +34,10 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
                 "import", $"./site.js?{_cacheBust}");
 
         var emoji = uninitialized ? "1️⃣" : "2️⃣";
+
         _logger.LogInformation(
-            "{Emoji} Initialized site.js (1st call: {First})", emoji, uninitialized);
+            "{Emoji} Initialized site.js (1st call: {Uninitialized})",
+            emoji, uninitialized);
     }
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.GetVideoDevicesAsync" />
@@ -67,7 +69,8 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
 
                 if (videoStarted)
                 {
-                    _logger.LogInformation("Video started (using 📹 ID: {Cam}).", deviceId);
+                    _logger.LogInformation(
+                        "Video started (using 📹 ID: {DeviceId}) [target='{Selector}'].", deviceId, selector);
                     _appState.CameraStatus = selector switch
                     {
                         ElementIds.CameraPreview => CameraStatus.Previewing,
@@ -86,13 +89,13 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
             else
             {
                 _logger.LogInformation(
-                    "🤖 Unable to start video (camera state: {State}.", _appState.CameraStatus);
+                    "🤖 Unable to start video (camera state: {State}).", _appState.CameraStatus);
                 return false;
             }
         }
         finally
         {
-            _logger.LogInformation("✅ Releasing exclusive 'start video' lock.");
+            _logger.LogInformation("🔐 Releasing exclusive 'start video' lock.");
             _lock.Release();
             _logger.LogInformation("🔓 Released lock (camera state: {State}).", _appState.CameraStatus);
         }
@@ -116,12 +119,22 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
         string roomName,
         string token)
     {
-        var createdOrJoinedRoom = _appState is not { CameraStatus: CameraStatus.Idle }
-            && await (_siteModule?.InvokeAsync<bool>("createOrJoinRoom", roomName, token)
-            ?? ValueTask.FromResult(false));
+        var cameraIsNotIdle = _appState is not { CameraStatus: CameraStatus.Idle };
+        if (cameraIsNotIdle)
+        {
+            _logger.LogInformation(
+                "📹 Camera is not idle, it's {Status}.", _appState.CameraStatus);
+        }
+
+        var createdOrJoinedRoom = cameraIsNotIdle
+            && await
+            (
+                _siteModule?.InvokeAsync<bool>("createOrJoinRoom", roomName, token)
+                ?? ValueTask.FromResult(false)
+            );
 
         _logger.LogInformation(
-            "✅ Created or joined room '{Room}': {Val}.", roomName, createdOrJoinedRoom);
+            """✅ Created or joined room "{Room}": {Val}.""", roomName, createdOrJoinedRoom);
 
         _appState.CameraStatus =
             createdOrJoinedRoom ? CameraStatus.InCall : CameraStatus.Previewing;
@@ -130,16 +143,23 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
     }
 
     /// <inheritdoc cref="ISiteVideoJavaScriptModule.LeaveRoom" />
-    public void LeaveRoom()
+    public bool LeaveRoom()
     {
         if (_appState is { CameraStatus: CameraStatus.Idle })
         {
             _logger.LogInformation("⁉️ Unable to leave room (already idle).");
-            return;
+            return false;
         }
 
-        _logger.LogInformation("🤗 Leaving room (camera state: {State}.", _appState.CameraStatus);
-        _siteModule?.InvokeVoid("leaveRoom");
-        _logger.LogInformation("👋🏽 Left room (camera state: {State}.", _appState.CameraStatus);
+        _logger.LogInformation("🤗 Leaving room (camera state: {State}).", _appState.CameraStatus);
+        var left = _siteModule?.Invoke<bool>("leaveRoom") ?? false;
+        _logger.LogInformation(
+            "👋🏽 Left={Val} room (camera state: {State}).", left, _appState.CameraStatus);
+
+        return left;
     }
+
+    /// <inheritdoc cref="ISiteVideoJavaScriptModule.LogInfo(string, object?[])" />
+    public void LogInfo(string message, params object?[] args) =>
+        _siteModule?.InvokeVoid("log", message, args);
 }

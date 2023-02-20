@@ -14,7 +14,11 @@ public partial class MainLayout
     [Inject] public required IDialogService Dialog { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
     [Inject] public required ILogger<MainLayout> Logger { get; set; }
-    
+
+    string LeaveRoomQuestion => $"""
+        Leave "{AppState.ActiveRoomName}" Room?
+        """;
+
     AppEventSubject AppEvents { get; set; }
 
     HubConnection? _hubConnection;
@@ -36,6 +40,14 @@ public partial class MainLayout
         _hubConnection.On<string>(HubEventNames.UserConnected, OnUserConnected);
 
         await _hubConnection.StartAsync();
+    }
+
+    void TryLeaveRoom()
+    {
+        if (JavaScript.LeaveRoom())
+        {
+            AppState.ActiveRoomName = null;
+        }
     }
 
     async Task OnAppEventMessageReceived(AppEventMessage eventMessage)

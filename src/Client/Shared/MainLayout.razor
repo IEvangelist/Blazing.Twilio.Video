@@ -29,8 +29,9 @@
         {
             <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.ExitToApp"
                    Color="Color.Primary" IconColor="Color.Secondary"
-                   Size="Size.Large">
-                Leave Room
+                   Size="Size.Large" title="@(LeaveRoomQuestion)"
+                   OnClick="@TryLeaveRoom">
+                @(LeaveRoomQuestion)
             </MudButton>
         }
         <MudSpacer />

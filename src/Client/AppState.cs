@@ -97,7 +97,7 @@ public sealed class AppState
 
     /// <summary>
     /// Gets or sets a <see cref="HashSet{T}"/> where
-    /// <c>T</c> is <see cref="RoomDetails"/>. Not persisted
+    /// <c>TCategoryName</c> is <see cref="RoomDetails"/>. Not persisted
     /// to <c>window.localStorage</c>.
     /// </summary>
     public HashSet<RoomDetails>? Rooms

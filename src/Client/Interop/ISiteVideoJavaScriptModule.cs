@@ -35,7 +35,7 @@ public interface ISiteVideoJavaScriptModule
     /// <summary>
     /// Leave the current contextual room.
     /// </summary>
-    void LeaveRoom();
+    bool LeaveRoom();
 
     /// <summary>
     /// Asynchronously starts video for the given <paramref name="deviceId"/>,
@@ -55,4 +55,12 @@ public interface ISiteVideoJavaScriptModule
     /// Stop video, detach underlying HTML <c><video></video></c> element.
     /// </summary>
     void StopVideo();
+
+    /// <summary>
+    /// Logs a message to the native browser's <c>console.log</c>
+    /// method, passing styles as additional parameters.
+    /// </summary>
+    /// <param name="message">Message or message template.</param>
+    /// <param name="args">The various style arguments.</param>
+    void LogInfo(string message, params object?[] args);
 }

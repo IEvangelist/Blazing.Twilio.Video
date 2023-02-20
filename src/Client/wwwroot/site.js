@@ -113,7 +113,9 @@ export const createOrJoinRoom = async (roomName, token) => {
         const tracks = [_audioTrack, _videoTrack];
         _activeRoom = await Twilio.Video.connect(
             token, {
-            name: roomName
+                name: roomName,
+                tracks,
+                dominantSpeaker: true
         });
 
         if (_activeRoom) {
@@ -135,6 +137,10 @@ export const createOrJoinRoom = async (roomName, token) => {
     return !!_activeRoom;
 };
 
+export const log = (message, args) => {
+    console.log(message, ...args);
+};
+
 const resetExistingTrack = ({
     track = null,
     nullOut = () => track = null
@@ -142,7 +148,7 @@ const resetExistingTrack = ({
     if (track) {
         track.detach().forEach(child => child.remove());
         track.stop();
-        
+
         if (nullOut) {
             nullOut();
         }
@@ -214,7 +220,7 @@ const isMemberDefined = (instance, member) => {
     return !!instance && instance[member] !== undefined;
 };
 
-export const leaveRoom = async () => {
+export const leaveRoom = () => {
     try {
         if (_activeRoom) {
             _activeRoom.disconnect();
@@ -227,5 +233,8 @@ export const leaveRoom = async () => {
     }
     catch (error) {
         console.error(error);
+        return false;
     }
+
+    return true;
 };
