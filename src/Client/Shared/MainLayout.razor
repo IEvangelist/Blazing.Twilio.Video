@@ -27,10 +27,11 @@
         <MudSpacer />
         @if (AppState.ActiveRoomName is not null)
         {
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.ExitToApp"
+            <MudButton Variant="Variant.Filled" 
+                   StartIcon="@Icons.Material.Filled.ArrowBack"
                    Color="Color.Primary" IconColor="Color.Secondary"
                    Size="Size.Large" title="@(LeaveRoomQuestion)"
-                   OnClick="@TryLeaveRoom">
+                   Style="font-size: 1.1rem;" OnClick="@TryLeaveRoom">
                 @(LeaveRoomQuestion)
             </MudButton>
         }
