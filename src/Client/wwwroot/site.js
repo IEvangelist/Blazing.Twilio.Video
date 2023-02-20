@@ -58,9 +58,11 @@ const waitForElement = (selector) => {
 export const startVideo = async (deviceId, selector) => {
     const cameraContainer = await waitForElement(selector);
     if (!cameraContainer) {
+        const errorMessage = `Unable to get HTML element matching ${selector}`;
+        console.log(errorMessage)
         return {
             Success: false,
-            ErrorMessage: `Unable to get HTML element matching ${selector}`
+            ErrorMessage: errorMessage
         };
     }
 
@@ -75,7 +77,7 @@ export const startVideo = async (deviceId, selector) => {
         cameraContainer.append(videoEl);
     } catch (error) {
         console.log(error);
-        return { Success: false, ErrorMessage: JSON.stringify(error) };
+        return { Success: false, ErrorMessage: error.toString() };
     }
 
     return { Success: true, ErrorMessage: null };
@@ -111,9 +113,7 @@ export const createOrJoinRoom = async (roomName, token) => {
         const tracks = [_audioTrack, _videoTrack];
         _activeRoom = await Twilio.Video.connect(
             token, {
-            name: roomName,
-            tracks,
-            dominantSpeaker: true
+            name: roomName
         });
 
         if (_activeRoom) {

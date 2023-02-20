@@ -15,6 +15,8 @@ public sealed partial class RoomDialog : IDisposable
     [Inject]
     public required AppState AppState { get; set; }
 
+    [Inject] public required ILogger<RoomDialog> Logger { get; set; }
+
     [Parameter]
     public required AppEventSubject AppEvents { get; set; }
 
@@ -23,6 +25,8 @@ public sealed partial class RoomDialog : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        Logger.LogInformation("Initializing...");
+
         AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
             ?? new();
         AppState.StateChanged += OnStateHasChanged;
@@ -59,7 +63,12 @@ public sealed partial class RoomDialog : IDisposable
             var addedOrJoined = await TryJoinRoom(_roomName);
             if (addedOrJoined)
             {
+                Logger.LogInformation("Added or joined {room}", _roomName);
                 _roomName = null;
+            }
+            else
+            {
+                Logger.LogInformation("Unable to add or join {room}", _roomName);
             }
         }
     }

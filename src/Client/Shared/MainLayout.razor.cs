@@ -24,6 +24,8 @@ public partial class MainLayout
 
     protected override async Task OnInitializedAsync()
     {
+        Logger.LogInformation("Initializing...");
+
         _hubConnection = new HubConnectionBuilder()
             .AddMessagePackProtocol()
             .WithUrl(NavigationManager.ToAbsoluteUri(HubEndpoints.NotificationHub))
@@ -38,6 +40,9 @@ public partial class MainLayout
 
     async Task OnAppEventMessageReceived(AppEventMessage eventMessage)
     {
+        Logger.LogInformation(
+            "App event message: {Type}", eventMessage.MessageType);
+
         if (eventMessage.MessageType is MessageType.LeftRoom)
         {
             JavaScript.LeaveRoom();

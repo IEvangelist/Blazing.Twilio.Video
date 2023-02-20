@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Client.Shared;
+
 namespace Blazing.Twilio.Video.Client.Components;
 
 public sealed partial class CameraDialog : IDisposable
@@ -8,6 +10,8 @@ public sealed partial class CameraDialog : IDisposable
     [Inject] public required ISiteVideoJavaScriptModule JavaScript { get; set; }
 
     [Inject] public required AppState AppState { get; set; }
+
+    [Inject] public required ILogger<CameraDialog> Logger { get; set; }
 
     [Parameter]
     public required AppEventSubject AppEvents { get; set; }
@@ -24,6 +28,8 @@ public sealed partial class CameraDialog : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        Logger.LogInformation("Initializing...");
+
         Devices = await JavaScript.GetVideoDevicesAsync();
         State = Devices switch
         {
@@ -40,6 +46,8 @@ public sealed partial class CameraDialog : IDisposable
 
     void OnValueChanged(string selectedValue)
     {
+        Logger.LogInformation("Camera selected...{Id}", selectedValue);
+
         _selectedCameraId = selectedValue;
 
         if (AppState is not { CameraStatus: CameraStatus.Idle })
