@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazing.Twilio.Video.Client.Shared;
-
 namespace Blazing.Twilio.Video.Client.Components;
 
 public sealed partial class CameraDialog : IDisposable
@@ -56,9 +54,9 @@ public sealed partial class CameraDialog : IDisposable
         }
 
         AppState.CameraStatus = CameraStatus.RequestingPreview;
-        AppEvents.TriggerAppEvent(new AppEventMessage(
-            Value: _selectedCameraId!,
-            MessageType: MessageType.CameraSelected));
+        //AppEvents.TriggerAppEvent(new AppEventMessage(
+        //    Value: _selectedCameraId!,
+        //    MessageType: MessageType.CameraSelected));
     }
 
     void SaveCameraSelection()

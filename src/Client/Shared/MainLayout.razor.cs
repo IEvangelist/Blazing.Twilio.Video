@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Extensions.Logging;
-
 namespace Blazing.Twilio.Video.Client.Shared;
 
 public partial class MainLayout
@@ -57,7 +55,7 @@ public partial class MainLayout
 
         if (eventMessage.MessageType is MessageType.LeftRoom)
         {
-            JavaScript.LeaveRoom();
+            TryLeaveRoom();
             return;
         }
 
