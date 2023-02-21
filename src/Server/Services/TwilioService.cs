@@ -34,7 +34,7 @@ internal sealed class TwilioService
     {
         var rooms = await RoomResource.ReadAsync(new ReadRoomOptions
         {
-            Status = RoomResource.RoomStatusEnum.Completed
+            Status = RoomResource.RoomStatusEnum.InProgress
         });
         var tasks = rooms.Select(
             room => GetRoomDetailsAsync(
