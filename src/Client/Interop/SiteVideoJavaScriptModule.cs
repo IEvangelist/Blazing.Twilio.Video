@@ -58,6 +58,7 @@ internal sealed class SiteVideoJavaScriptModule : ISiteVideoJavaScriptModule
         try
         {
             var availableToAttempt = _appState is { CameraStatus: CameraStatus.Idle }
+                or { CameraStatus: CameraStatus.RequestingPreview }
                 && deviceId is not null && selector is not null;
 
             if (availableToAttempt)

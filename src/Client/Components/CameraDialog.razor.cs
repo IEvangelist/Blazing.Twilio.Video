@@ -28,6 +28,7 @@ public sealed partial class CameraDialog : IDisposable
     {
         Logger.LogInformation("Initializing...");
 
+        AppState.CameraStatus = CameraStatus.RequestingPreview;
         Devices = await JavaScript.GetVideoDevicesAsync();
         State = Devices switch
         {
@@ -42,30 +43,22 @@ public sealed partial class CameraDialog : IDisposable
         }
     }
 
-    void OnValueChanged(string selectedValue)
+    async Task OnValueChanged(string selectedValue)
     {
         Logger.LogInformation("Camera selected...{Id}", selectedValue);
 
         _selectedCameraId = selectedValue;
 
-        if (AppState is not { CameraStatus: CameraStatus.Idle })
-        {
-            return;
-        }
-
-        AppState.CameraStatus = CameraStatus.RequestingPreview;
-        //AppEvents.TriggerAppEvent(new AppEventMessage(
-        //    Value: _selectedCameraId!,
-        //    MessageType: MessageType.CameraSelected));
+        await JavaScript.StartVideoAsync(
+            _selectedCameraId, ElementIds.CameraPreview);
     }
 
     void SaveCameraSelection()
     {
+        MudDialog.Close(DialogResult.Ok(true));
         AppEvents.TriggerAppEvent(new AppEventMessage(
             Value: _selectedCameraId!,
             MessageType: MessageType.CameraSelected));
-
-        MudDialog.Close(DialogResult.Ok(true));
     }
 
     void Cancel()

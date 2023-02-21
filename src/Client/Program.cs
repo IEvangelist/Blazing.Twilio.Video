@@ -15,4 +15,6 @@ builder.Services.AddLocalStorageServices();
 builder.Services.AddSingleton<ISiteVideoJavaScriptModule, SiteVideoJavaScriptModule>();
 builder.Services.AddMudServices();
 
-await builder.Build().RunAsync();
+var app = builder.Build();
+
+await app.RunAsync();

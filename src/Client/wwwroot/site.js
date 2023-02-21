@@ -67,10 +67,11 @@ export const startVideo = async (deviceId, selector) => {
     }
 
     try {
-        resetExistingTrack({
-            track: _videoTrack,
-            nullOut: () => _videoTrack = null
-        });
+        if (_videoTrack) {
+            _videoTrack.detach().forEach(child => child.remove());
+            _videoTrack.stop();
+            _videoTrack = null;
+        }
 
         _videoTrack = await Twilio.Video.createLocalVideoTrack({ deviceId });
         const videoEl = _videoTrack.attach();
@@ -85,10 +86,11 @@ export const startVideo = async (deviceId, selector) => {
 
 export const stopVideo = () => {
     try {
-        resetExistingTrack({
-            track: _videoTrack,
-            nullOut: () => _videoTrack = null
-        });
+        if (_videoTrack) {
+            _videoTrack.detach().forEach(child => child.remove());
+            _videoTrack.stop();
+            _videoTrack = null;
+        }
     } catch (error) {
         console.log(error);
     }
@@ -104,10 +106,11 @@ export const createOrJoinRoom = async (roomName, token) => {
             await startVideo(localStorage['camera-device-id'], 'participant-1');
         }
 
-        resetExistingTrack({
-            track: _audioTrack,
-            nullOut: () => _audioTrack = null
-        });
+        if (_audioTrack) {
+            _audioTrack.detach().forEach(child => child.remove());
+            _audioTrack.stop();
+            _audioTrack = null;
+        }
 
         _audioTrack = await Twilio.Video.createLocalAudioTrack();
         const tracks = [_audioTrack, _videoTrack];
@@ -139,20 +142,6 @@ export const createOrJoinRoom = async (roomName, token) => {
 
 export const log = (message, args) => {
     console.log(message, ...args);
-};
-
-const resetExistingTrack = ({
-    track = null,
-    nullOut = () => track = null
-}) => {
-    if (track) {
-        track.detach().forEach(child => child.remove());
-        track.stop();
-
-        if (nullOut) {
-            nullOut();
-        }
-    }
 };
 
 const initialize = (participants) => {
