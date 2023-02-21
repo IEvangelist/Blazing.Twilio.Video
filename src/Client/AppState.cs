@@ -45,6 +45,7 @@ public sealed class AppState
     /// <list type="bullet">
     /// <item><c><see cref="CameraStatus.Idle"/></c>: (default) camera status is idle.</item>
     /// <item><c><see cref="CameraStatus.Previewing"/></c>: camera is being previewed.</item>
+    /// <item><c><see cref="CameraStatus.RequestingPreview"/></c>: requesting a preview of the camera.</item>
     /// <item><c><see cref="CameraStatus.InCall"/></c>: camera is being used in a call.</item>
     /// </list>
     /// </summary>

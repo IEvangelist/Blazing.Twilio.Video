@@ -44,7 +44,16 @@ public partial class MainLayout
     {
         if (JavaScript.LeaveRoom())
         {
+            var roomName = AppState.ActiveRoomName;
             AppState.ActiveRoomName = null;
+            Snackbar.Add(
+                $"""You have left the "{roomName}" room.""",
+                Severity.Info,
+                options =>
+                {
+                    options.CloseAfterNavigation = true;
+                    options.IconSize = Size.Large;
+                });
         }
     }
 
@@ -75,11 +84,10 @@ public partial class MainLayout
         if (eventMessage.MessageType is MessageType.CameraSelected &&
             (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
         {
-            var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
-                ? ElementIds.CameraPreview
-                : ElementIds.ParticipantOne;
-
-            await JavaScript.StartVideoAsync(deviceId, selector);
+            if (await JavaScript.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
+            {
+                AppState.CameraStatus = CameraStatus.InCall;
+            }
         }
     }
 

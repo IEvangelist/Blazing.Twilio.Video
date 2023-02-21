@@ -78,7 +78,7 @@ export const startVideo = async (deviceId, selector) => {
         cameraContainer.append(videoEl);
     } catch (error) {
         console.log(error);
-        return { Success: false, ErrorMessage: error.toString() };
+        return { Success: false, ErrorMessage: error.message };
     }
 
     return { Success: true, ErrorMessage: null };

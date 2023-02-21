@@ -18,17 +18,24 @@ internal sealed class TwilioService
             _twilioSettings.ApiSecret ?? "no-secret");
     }
 
-    public TwilioJwt GetTwilioJwt(string? identity) =>
-        new(Token: new Token(
+    public TwilioJwt GetTwilioJwt(string? identity)
+    {
+        var token = new Token(
             _twilioSettings.AccountSid,
             _twilioSettings.ApiKey,
             _twilioSettings.ApiSecret,
             identity ?? GetName(),
-            grants: new HashSet<IGrant> { new VideoGrant() }).ToJwt());
+            grants: new HashSet<IGrant> { new VideoGrant() });
+
+        return new(Token: token.ToJwt());
+    }
 
     public async ValueTask<IEnumerable<RoomDetails>> GetAllRoomsAsync()
     {
-        var rooms = await RoomResource.ReadAsync();
+        var rooms = await RoomResource.ReadAsync(new ReadRoomOptions
+        {
+            Status = RoomResource.RoomStatusEnum.Completed
+        });
         var tasks = rooms.Select(
             room => GetRoomDetailsAsync(
                 room,
