@@ -182,14 +182,14 @@ const registerParticipantEvents = (participant, isLocal) => {
 };
 
 const subscribe = (publication, isLocal) => {
-    if (isMemberDefined(publication, 'on')) {
+    if (isFunctionDefined(publication, 'on')) {
         publication.on('subscribed', track => attachTrack(track, isLocal));
         publication.on('unsubscribed', track => detachTrack(track));
     }
 };
 
 const attachTrack = (track, isLocal) => {
-    if (isMemberDefined(track, 'attach')) {
+    if (isFunctionDefined(track, 'attach')) {
         const audioOrVideo = track.attach();
         audioOrVideo.id = track.sid;
 
@@ -199,14 +199,14 @@ const attachTrack = (track, isLocal) => {
 };
 
 const detachTrack = (track) => {
-    if (this.isMemberDefined(track, 'detach')) {
+    if (isFunctionDefined(track, 'detach')) {
         track.detach()
             .forEach(el => el.remove());
     }
 };
 
-const isMemberDefined = (instance, member) => {
-    return !!instance && instance[member] !== undefined;
+const isFunctionDefined = (instance, member) => {
+    return !!instance && typeof instance[member] === 'function';
 };
 
 export const leaveRoom = () => {
