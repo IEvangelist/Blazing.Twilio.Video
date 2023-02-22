@@ -43,7 +43,7 @@
                         {
                             <MudListItem Text=@($"{room.Name} (Joinable)") IconColor="Color.Success"
                              Icon="@Icons.Material.Filled.PersonAdd"
-                             OnClick=@(() => AppState.ActiveRoomName = room.Name) />
+                             OnClick=@(async () => await TryJoinRoom(room.Name)) />
                         }
                     }
                 </MudList>
