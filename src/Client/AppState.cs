@@ -24,6 +24,11 @@ public sealed class AppState
     public AppState(ILocalStorageService storage) => _storage = storage;
 
     /// <summary>
+    /// 
+    /// </summary>
+    public static Device[]? Devices { get; set; }
+
+    /// <summary>
     /// Gets or sets the selected camera device identifier.
     /// Persisted to <c>window.localStorage["camera-device-id"]</c>
     /// </summary>

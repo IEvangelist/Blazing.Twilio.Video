@@ -1,12 +1,12 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazor.Serialization.Extensions;
+
 namespace Blazing.Twilio.Video.Client.Components;
 
 public sealed partial class CameraDialog : IDisposable
 {
-    [Inject] public required ISiteVideoJavaScriptModule JavaScript { get; set; }
-
     [Inject] public required AppState AppState { get; set; }
 
     [Inject] public required ILogger<CameraDialog> Logger { get; set; }
@@ -29,7 +29,9 @@ public sealed partial class CameraDialog : IDisposable
         Logger.LogInformation("Initializing...");
 
         AppState.CameraStatus = CameraStatus.RequestingPreview;
-        Devices = await JavaScript.GetVideoDevicesAsync();
+        var json = await SiteJavaScriptModule.RequestVideoDevicesAsync();
+        Logger.LogInformation("Devices: {Json}", json);
+        Devices = json.FromJson<Device[]>() ?? Array.Empty<Device>();
         State = Devices switch
         {
             null or { Length: 0 } => RequestCameraState.Error,
@@ -41,6 +43,8 @@ public sealed partial class CameraDialog : IDisposable
         {
             _selectedCameraId = selectedDeviceId;
         }
+
+        await SiteJavaScriptModule.ExitPictureInPictureAsync();
     }
 
     async Task OnValueChanged(string selectedValue)
@@ -49,7 +53,7 @@ public sealed partial class CameraDialog : IDisposable
 
         _selectedCameraId = selectedValue;
 
-        if (await JavaScript.StartVideoAsync(
+        if (await SiteJavaScriptModule.StartVideoAsync(
             _selectedCameraId, ElementIds.CameraPreview))
         {
             AppState.CameraStatus = CameraStatus.Previewing;
@@ -67,8 +71,8 @@ public sealed partial class CameraDialog : IDisposable
     void Cancel()
     {
         MudDialog.Cancel();
-        JavaScript.StopVideo();
+        SiteJavaScriptModule.StopVideo();
     }
 
-    void IDisposable.Dispose() => JavaScript.StopVideo();
+    void IDisposable.Dispose() => SiteJavaScriptModule.StopVideo();
 }

@@ -8,7 +8,7 @@ namespace Blazing.Twilio.Video.Client.Services;
 
 public sealed class AppEventSubject : IDisposable
 {
-    readonly Subject<AppEventMessage> _appEventMessageSubject = new();
+    static readonly Subject<AppEventMessage> s_appEventMessageSubject = new();
     readonly IObservable<AppEventMessage> _appEventObservable;
     readonly IDisposable _appEventSubscription;
     readonly Func<AppEventMessage, Task> _observer;
@@ -16,15 +16,18 @@ public sealed class AppEventSubject : IDisposable
     public AppEventSubject(Func<AppEventMessage, Task> observer)
     {
         _observer = observer;
-        _appEventObservable = _appEventMessageSubject.AsObservable();
+        _appEventObservable = s_appEventMessageSubject.AsObservable();
         _appEventSubscription = _appEventObservable.Subscribe(
             eventMessage => _observer(eventMessage));
     }
 
     internal void TriggerAppEvent(AppEventMessage eventMessage) =>
-        _appEventMessageSubject.OnNext(eventMessage);
+        NotifyAppEvent(eventMessage);
 
     void IDisposable.Dispose() => _appEventSubscription.Dispose();
+
+    internal static void NotifyAppEvent(AppEventMessage eventMessage) =>
+        s_appEventMessageSubject.OnNext(eventMessage);
 }
 
 /// <summary>

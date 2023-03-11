@@ -4,7 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\site.js" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Blazor.LocalStorage.WebAssembly" Version="7.0.3" />
@@ -19,5 +24,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\Blazing.Twilio.Video.Shared.csproj" />
   </ItemGroup>
+
+  <!--<ItemGroup>
+    <WasmExtraFilesToDeploy Include="wwwroot\site.js" />
+  </ItemGroup>-->
 
 </Project>

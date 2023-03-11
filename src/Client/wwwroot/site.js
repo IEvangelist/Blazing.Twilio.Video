@@ -4,7 +4,11 @@ let _activeRoom = null;
 let _participants = new Map();
 let _dominantSpeaker = null;
 
-export const getVideoDevices = async () => {
+/*
+    Requests the navigator.mediaDevices for video input.
+    global navigator,console
+*/
+export async function requestVideoDevices() {
     try {
         // Ask the first time to prime the underlying device list.
         let devices = await navigator.mediaDevices.enumerateDevices();
@@ -15,7 +19,7 @@ export const getVideoDevices = async () => {
             });
         }
 
-        // Ask again, if the user allowed it the device list is now poplated.
+        // Ask again, if the user allowed it the device list is now populated.
         // If not, the const returns an empty array.
         devices = await navigator.mediaDevices.enumerateDevices();
         if (devices && devices.length) {
@@ -26,16 +30,16 @@ export const getVideoDevices = async () => {
                     deviceResults.push({ deviceId, label });
                 });
 
-            return deviceResults;
+            return JSON.stringify(deviceResults);
         }
     } catch (error) {
         console.log(error);
     }
 
-    return [];
-};
+    return JSON.stringify([]);
+}
 
-const waitForElement = (selector) => {
+function waitForElement(selector) {
     return new Promise(resolve => {
         if (document.querySelector(selector)) {
             return resolve(document.querySelector(selector));
@@ -53,17 +57,14 @@ const waitForElement = (selector) => {
             subtree: true
         });
     });
-};
+}
 
-export const startVideo = async (deviceId, selector) => {
+export async function startVideo(deviceId, selector) {
     const cameraContainer = await waitForElement(selector);
     if (!cameraContainer) {
         const errorMessage = `Unable to get HTML element matching ${selector}`;
-        console.log(errorMessage)
-        return {
-            Success: false,
-            ErrorMessage: errorMessage
-        };
+        console.log(errorMessage);
+        return false;
     }
 
     try {
@@ -78,13 +79,13 @@ export const startVideo = async (deviceId, selector) => {
         cameraContainer.append(videoEl);
     } catch (error) {
         console.log(error);
-        return { Success: false, ErrorMessage: error.message };
+        return false;
     }
+    
+    return true;
+}
 
-    return { Success: true, ErrorMessage: null };
-};
-
-export const stopVideo = () => {
+export function stopVideo() {
     try {
         if (_videoTrack) {
             _videoTrack.detach().forEach(child => child.remove());
@@ -94,9 +95,9 @@ export const stopVideo = () => {
     } catch (error) {
         console.log(error);
     }
-};
+}
 
-export const createOrJoinRoom = async (roomName, token) => {
+export async function createOrJoinRoom(roomName, token) {
     try {
         if (_activeRoom) {
             _activeRoom.disconnect();
@@ -138,11 +139,11 @@ export const createOrJoinRoom = async (roomName, token) => {
     }
 
     return !!_activeRoom;
-};
+}
 
-export const log = (message, args) => {
+export function log(message, args) {
     console.log(message, ...args);
-};
+}
 
 const initialize = (participants) => {
     _participants = participants;
@@ -209,7 +210,7 @@ const isFunctionDefined = (instance, member) => {
     return !!instance && typeof instance[member] === 'function';
 };
 
-export const leaveRoom = () => {
+export function leaveRoom() {
     try {
         if (_activeRoom) {
             _activeRoom.disconnect();
@@ -226,4 +227,22 @@ export const leaveRoom = () => {
     }
 
     return true;
-};
+}
+
+export async function isPictureInPictureSupported(selector) {
+    const cameraContainer = await waitForElement(selector);
+    if (!cameraContainer) {
+        const errorMessage = `Unable to get HTML element matching ${selector}`;
+        console.log(errorMessage);
+        return false;
+    }
+
+    return document.pictureInPictureEnabled
+        && cameraContainer.disablePictureInPicture === false;
+}
+
+export async function exitPictureInPicture() {
+    if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+    }
+}

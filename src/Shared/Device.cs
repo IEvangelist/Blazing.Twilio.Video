@@ -8,6 +8,8 @@ namespace Blazing.Twilio.Video.Shared;
 /// </summary>
 /// <param name="DeviceId">The device identifier.</param>
 /// <param name="Label">The label (human readable name) of the device.</param>
-public readonly record struct Device(
-    string DeviceId,
-    string Label);
+public sealed class Device
+{
+    public required string DeviceId { get; init; }
+    public required string Label { get; init; }
+}

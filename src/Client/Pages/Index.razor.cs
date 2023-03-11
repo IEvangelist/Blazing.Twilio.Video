@@ -6,9 +6,6 @@ namespace Blazing.Twilio.Video.Client.Pages;
 public sealed partial class Index : IDisposable
 {
     [Inject]
-    public required ISiteVideoJavaScriptModule JavaScript { get; set; }
-
-    [Inject]
     public required AppState AppState { get; set; }
 
     [Inject]
@@ -16,24 +13,22 @@ public sealed partial class Index : IDisposable
 
     [CascadingParameter]
     public required AppEventSubject AppEvents { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    
+    protected override void OnInitialized()
     {
         AppState.StateChanged += OnStateHasChanged;
-
-        await JavaScript.InitializeModuleAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (AppState.SelectedCameraId is { } deviceId)
-        {
-            var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
-                ? ElementIds.CameraPreview
-                : ElementIds.ParticipantOne;
-
-            await JavaScript.StartVideoAsync(deviceId, selector);
-        }
+        //if (AppState.SelectedCameraId is { } deviceId)
+        //{
+        //    var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
+        //        ? ElementIds.CameraPreview
+        //        : ElementIds.ParticipantOne;
+        //
+        //    await SiteJavaScriptModule.StartVideoAsync(deviceId, selector);
+        //}
     }
 
     void OnStateHasChanged(string appStatePropertyName)

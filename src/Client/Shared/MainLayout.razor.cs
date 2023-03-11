@@ -8,7 +8,6 @@ public partial class MainLayout
     [Inject] public required NavigationManager NavigationManager { get; set; }
     [Inject] public required HttpClient Http { get; set; }
     [Inject] public required AppState AppState { get; set; }
-    [Inject] public required ISiteVideoJavaScriptModule JavaScript { get; set; }
     [Inject] public required IDialogService Dialog { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
     [Inject] public required ILogger<MainLayout> Logger { get; set; }
@@ -42,7 +41,7 @@ public partial class MainLayout
 
     void TryLeaveRoom()
     {
-        if (JavaScript.LeaveRoom())
+        if (SiteJavaScriptModule.LeaveRoom())
         {
             var roomName = AppState.ActiveRoomName;
             AppState.ActiveRoomName = null;
@@ -71,7 +70,7 @@ public partial class MainLayout
         if (_hubConnection is not null &&
             eventMessage.MessageType is MessageType.RoomCreatedOrJoined)
         {
-            await JavaScript.CreateOrJoinRoomAsync(
+            await SiteJavaScriptModule.CreateOrJoinRoomAsync(
                 eventMessage.Value, eventMessage.TwilioToken!);
 
             await _hubConnection.InvokeAsync(
@@ -84,7 +83,7 @@ public partial class MainLayout
         if (eventMessage.MessageType is MessageType.CameraSelected &&
             (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
         {
-            if (await JavaScript.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
+            if (await SiteJavaScriptModule.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
             {
                 AppState.CameraStatus = CameraStatus.InCall;
             }
