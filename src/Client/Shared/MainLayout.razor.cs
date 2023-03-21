@@ -43,23 +43,29 @@ public partial class MainLayout
     {
         if (SiteJavaScriptModule.LeaveRoom())
         {
-            var roomName = AppState.ActiveRoomName;
-            AppState.ActiveRoomName = null;
-            Snackbar.Add(
-                $"""You have left the "{roomName}" room.""",
-                Severity.Info,
-                options =>
+            _ = SiteJavaScriptModule.ExitPictureInPictureAsync(exited =>
+            {
+                if (exited)
                 {
-                    options.CloseAfterNavigation = true;
-                    options.IconSize = Size.Large;
-                });
+                    var roomName = AppState.ActiveRoomName;
+                    AppState.ActiveRoomName = null;
+                    Snackbar.Add(
+                        $"""You have left the "{roomName}" room.""",
+                        Severity.Info,
+                        options =>
+                        {
+                            options.CloseAfterNavigation = true;
+                            options.IconSize = Size.Large;
+                        });
+                }
+            });
         }
     }
 
     async Task OnAppEventMessageReceived(AppEventMessage eventMessage)
     {
         Logger.LogInformation(
-            "App event message: {Type}", eventMessage.MessageType);
+            "⚡ App event message: {Type}", eventMessage.MessageType);
 
         if (eventMessage.MessageType is MessageType.LeftRoom)
         {
@@ -73,6 +79,20 @@ public partial class MainLayout
             await SiteJavaScriptModule.CreateOrJoinRoomAsync(
                 eventMessage.Value, eventMessage.TwilioToken!);
 
+            await SiteJavaScriptModule.RequestPictureInPictureAsync(
+                selector: $"""
+                {ElementIds.ParticipantOne} > video
+                """,
+                isPictureInPicture =>
+                {
+                    // TODO: Always seems false, even though it worked?!
+                    // if (isPictureInPicture)
+                    {
+                        AppState.CameraStatus = CameraStatus.PictureInPicture;
+                    }
+                },
+                onExited: () => AppState.CameraStatus = CameraStatus.InCall);
+
             await _hubConnection.InvokeAsync(
                 HubEventNames.RoomsUpdated,
                 AppState.ActiveRoomName = eventMessage.Value);
@@ -80,14 +100,14 @@ public partial class MainLayout
             return;
         }
 
-        if (eventMessage.MessageType is MessageType.CameraSelected &&
-            (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
-        {
-            if (await SiteJavaScriptModule.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
-            {
-                AppState.CameraStatus = CameraStatus.InCall;
-            }
-        }
+        //if (eventMessage.MessageType is MessageType.CameraSelected &&
+        //    (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
+        //{
+        //    if (await SiteJavaScriptModule.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
+        //    {
+        //        AppState.CameraStatus = CameraStatus.InCall;
+        //    }
+        //}
     }
 
     Task OnRoomAdded(string roomName) =>

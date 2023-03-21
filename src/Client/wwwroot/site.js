@@ -6,6 +6,7 @@ let _dominantSpeaker = null;
 
 /*
     Requests the navigator.mediaDevices for video input.
+    @returns {Promise<string>}.
     global navigator,console
 */
 export async function requestVideoDevices() {
@@ -41,14 +42,24 @@ export async function requestVideoDevices() {
 
 function waitForElement(selector) {
     return new Promise(resolve => {
-        if (document.querySelector(selector)) {
-            return resolve(document.querySelector(selector));
+        const element = document.querySelector(selector);
+        if (element) {
+            return resolve(element);
         }
 
         const observer = new MutationObserver(mutations => {
-            if (document.querySelector(selector)) {
-                resolve(document.querySelector(selector));
+            const elem = document.querySelector(selector);
+            if (elem) {
+                resolve(elem);
                 observer.disconnect();
+            }
+
+            if (mutations) {
+                mutations.forEach(m => {
+                    console.log(
+                        `${m.attributeName} (${m.attributeNamespace}) added ${m.addedNodes.length} nodes.`
+                    );
+                });
             }
         });
 
@@ -81,7 +92,7 @@ export async function startVideo(deviceId, selector) {
         console.log(error);
         return false;
     }
-    
+
     return true;
 }
 
@@ -117,9 +128,9 @@ export async function createOrJoinRoom(roomName, token) {
         const tracks = [_audioTrack, _videoTrack];
         _activeRoom = await Twilio.Video.connect(
             token, {
-                name: roomName,
-                tracks,
-                dominantSpeaker: true
+            name: roomName,
+            tracks,
+            dominantSpeaker: true
         });
 
         if (_activeRoom) {
@@ -229,20 +240,65 @@ export function leaveRoom() {
     return true;
 }
 
+export async function requestPictureInPicture(selector, onSuccess, onExited) {
+    if (!await isPictureInPictureSupported(selector)) {
+        console.log(`Picture-in-Picture isn't supported on this browser on element: ${selector}`);
+    }
+
+    const videoElement = await waitForElement(selector);
+    if (videoElement) {
+        videoElement.addEventListener("enterpictureinpicture", e => {
+            if (onSuccess) {
+                onSuccess(true);
+            }
+        });
+
+        videoElement.addEventListener("leavepictureinpicture", e => {
+            if (onExited) {
+                onExited();
+            }
+        });
+
+        const pipWindow = await videoElement.requestPictureInPicture();
+        try {
+            if (pipWindow) {
+
+                const log = () => {
+                    console.log(`PiP window is ${pipWindow.width}x${pipWindow.height}`);
+                };
+
+                log();
+                pipWindow.onresize = log;
+
+            }
+        } catch {
+            // Not a big deal... 🙄
+        }
+    }
+}
+
 export async function isPictureInPictureSupported(selector) {
-    const cameraContainer = await waitForElement(selector);
-    if (!cameraContainer) {
-        const errorMessage = `Unable to get HTML element matching ${selector}`;
+    const videoElement = await waitForElement(selector);
+    if (!videoElement) {
+        const errorMessage = `Unable to get HTML video element matching ${selector}`;
         console.log(errorMessage);
         return false;
     }
 
     return document.pictureInPictureEnabled
-        && cameraContainer.disablePictureInPicture === false;
+        && videoElement.disablePictureInPicture === false;
 }
 
-export async function exitPictureInPicture() {
-    if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture();
+export async function exitPictureInPicture(onExited) {
+    let exited = false;
+    try {
+        if (document.pictureInPictureElement) {
+            await document.exitPictureInPicture();
+            exited = true;
+        }
+    } finally {
+        if (onExited) {
+            onExited(exited);
+        }
     }
 }

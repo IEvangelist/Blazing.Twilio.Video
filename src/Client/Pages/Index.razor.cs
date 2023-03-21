@@ -5,11 +5,54 @@ namespace Blazing.Twilio.Video.Client.Pages;
 
 public sealed partial class Index : IDisposable
 {
-    [Inject]
-    public required AppState AppState { get; set; }
+    /// <summary>The "#participant-1 > video" HTML element.</summary>
+    int OneSize =>
+        AppState switch
+        {
+            { CameraStatus: CameraStatus.PictureInPicture } => 0,
+            {
+                CameraStatus:
+                    CameraStatus.Idle or
+                    CameraStatus.InCall or
+                    CameraStatus.RequestingPreview or
+                    CameraStatus.Previewing
+            } => 5,
+            _ => 10
+        };
 
-    [Inject]
-    public required ILogger<Index> Logger { get; set; }
+    /// <summary>Is <c>"hidden"</c> when <see cref="OneSize"/> is <c>0</c>.
+    /// Otherwise, <c>"min-vh-55"</c> is returned.</summary>
+    string OneClass => OneSize switch
+    {
+        0 => "hidden",
+        _ => "min-vh-55"
+    };
+
+    /// <summary>The "#participant-2 > video" HTML element.</summary>
+    int TwoSize =>
+        AppState switch
+        {
+            { CameraStatus: CameraStatus.PictureInPicture } => 10,
+            { CameraStatus:
+                CameraStatus.Idle or
+                CameraStatus.InCall or
+                CameraStatus.RequestingPreview or
+                CameraStatus.Previewing
+            } => 5,
+            _ => 0
+        };
+
+    /// <summary>Is <c>"hidden"</c> when <see cref="TwoSize"/> is <c>0</c>.
+    /// Otherwise, <c>"min-vh-55"</c> is returned.</summary>
+    string TwoClass => TwoSize switch
+    {
+        0 => "hidden",
+        _ => "min-vh-55"
+    };
+
+    [Inject] public required AppState AppState { get; set; }
+
+    [Inject] public required ILogger<Index> Logger { get; set; }
 
     [CascadingParameter]
     public required AppEventSubject AppEvents { get; set; }
@@ -21,14 +64,19 @@ public sealed partial class Index : IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //if (AppState.SelectedCameraId is { } deviceId)
-        //{
-        //    var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
-        //        ? ElementIds.CameraPreview
-        //        : ElementIds.ParticipantOne;
-        //
-        //    await SiteJavaScriptModule.StartVideoAsync(deviceId, selector);
-        //}
+        if (firstRender is false && AppState.SelectedCameraId is { } deviceId)
+        {
+            if (AppState is { CameraStatus: CameraStatus.PictureInPicture or CameraStatus.InCall })
+            {
+                return;
+            }
+
+            var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
+                ? ElementIds.CameraPreview
+                : ElementIds.ParticipantOne;
+
+            await SiteJavaScriptModule.StartVideoAsync(deviceId, selector);
+        }
     }
 
     void OnStateHasChanged(string appStatePropertyName)

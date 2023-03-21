@@ -37,8 +37,10 @@
         }
         <MudSpacer />
         <MudToggleIconButton @bind-Toggled="@AppState.IsDarkTheme"
+                             Title="Switch to Dark Theme"
                              Size="Size.Large" Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit"
-                             ToggledIcon="@Icons.Material.Filled.Brightness1" ToggledColor="Color.Inherit" />
+                             ToggledTitle="Switch to Light Theme"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="Color.Inherit" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub"
                        Size="Size.Large" Color="Color.Inherit" Target="_blank"
                        Href="https://github.com/IEvangelist/Blazing.Twilio.Video" />

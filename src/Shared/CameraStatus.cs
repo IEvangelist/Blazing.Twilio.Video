@@ -19,5 +19,8 @@ public enum CameraStatus
     RequestingPreview,
 
     /// <summary>The camera status when in a call.</summary>
-    InCall
+    InCall,
+
+    /// <summary>The users' camera is shown as picture-in-picture (PiP).</summary>
+    PictureInPicture
 };

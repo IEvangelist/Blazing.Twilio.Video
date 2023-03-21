@@ -1,6 +1,7 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Text.Json;
 using Blazor.Serialization.Extensions;
 
 namespace Blazing.Twilio.Video.Client.Components;
@@ -31,7 +32,7 @@ public sealed partial class CameraDialog : IDisposable
         AppState.CameraStatus = CameraStatus.RequestingPreview;
         var json = await SiteJavaScriptModule.RequestVideoDevicesAsync();
         Logger.LogInformation("Devices: {Json}", json);
-        Devices = json.FromJson<Device[]>() ?? Array.Empty<Device>();
+        Devices = json.FromJson<Device[]>(new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? Array.Empty<Device>();
         State = Devices switch
         {
             null or { Length: 0 } => RequestCameraState.Error,
@@ -44,7 +45,14 @@ public sealed partial class CameraDialog : IDisposable
             _selectedCameraId = selectedDeviceId;
         }
 
-        await SiteJavaScriptModule.ExitPictureInPictureAsync();
+        await SiteJavaScriptModule.ExitPictureInPictureAsync(
+            onExited: exited =>
+            {
+                if (exited)
+                {
+                    AppState.CameraStatus = CameraStatus.RequestingPreview;
+                }
+            });
     }
 
     async Task OnValueChanged(string selectedValue)

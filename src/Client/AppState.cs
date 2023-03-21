@@ -1,14 +1,17 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Shared;
+
 namespace Blazing.Twilio.Video.Client;
 
 /// <summary>
-/// An app state class ? some properties are persisted to <c>window.localStorage</c>.
+/// An app state class and some properties are persisted to <c>window.localStorage</c>.
 /// </summary>
 public sealed class AppState
 {
     readonly ILocalStorageService _storage;
+    readonly ILogger<AppState> _logger;
 
     string? _selectedCameraId;
     bool _isDarkTheme;
@@ -21,7 +24,8 @@ public sealed class AppState
     /// </summary>
     public event Action<string>? StateChanged;
 
-    public AppState(ILocalStorageService storage) => _storage = storage;
+    public AppState(ILocalStorageService storage, ILogger<AppState> logger) =>
+        (_storage, _logger) = (storage, logger);
 
     /// <summary>
     /// 
@@ -39,6 +43,10 @@ public sealed class AppState
         {
             if (_selectedCameraId != value)
             {
+                _logger.LogInformation(
+                    "AppState.{SelectedCameraId} changed (Was: {CameraId}, Now: {Value})",
+                    nameof(SelectedCameraId), _selectedCameraId, value);
+
                 _storage.SetItem(StorageKeys.CameraDeviceId, _selectedCameraId = value);
                 StateChanged?.Invoke(nameof(SelectedCameraId));
             }
@@ -61,6 +69,10 @@ public sealed class AppState
         {
             if (_cameraStatus != value)
             {
+                _logger.LogInformation(
+                    "⚙️ Changed: AppState.CameraStatus = {Value} (Was: {Status})",
+                    value, _cameraStatus);
+
                 _cameraStatus = value;
                 StateChanged?.Invoke(nameof(CameraStatus));
             }
@@ -78,6 +90,10 @@ public sealed class AppState
         {
             if (_isDarkTheme != value)
             {
+                _logger.LogInformation(
+                    "⚙️ Changed: AppState.IsDarkTheme = {Value} (Was: {DarkTheme})",
+                    value, _isDarkTheme);
+
                 _storage.SetItem(StorageKeys.PrefersDarkTheme, _isDarkTheme = value);
                 StateChanged?.Invoke(nameof(IsDarkTheme));
             }
@@ -95,6 +111,10 @@ public sealed class AppState
         {
             if (_activeRoomName != value)
             {
+                _logger.LogInformation(
+                    "⚙️ Changed: AppState.ActiveRoomName = {Value} (Was: {RoomName})",
+                    value, _activeRoomName);
+
                 _activeRoomName = value;
                 StateChanged?.Invoke(nameof(ActiveRoomName));
             }

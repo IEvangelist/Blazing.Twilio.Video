@@ -15,7 +15,6 @@ internal sealed partial class SiteJavaScriptModule
     /// <remarks>This will never return <c>null</c>, instead it will
     /// return an empty array <see cref="Device[]"/>.</remarks>
     [JSImport("requestVideoDevices", nameof(SiteJavaScriptModule))]
-    [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     public static partial Task<string> RequestVideoDevicesAsync();
 
     /// <summary>
@@ -25,7 +24,6 @@ internal sealed partial class SiteJavaScriptModule
     /// <remarks>This will never return <c>null</c>, instead it will
     /// return an empty array <see cref="Device[]"/>.</remarks>
     [JSImport("startVideo", nameof(SiteJavaScriptModule))]
-    [return: JSMarshalAs<JSType.Promise<JSType.Boolean>>]
     public static partial Task<bool> StartVideoAsync(string? deviceId, string? selector);
 
     /// <summary>
@@ -65,30 +63,40 @@ internal sealed partial class SiteJavaScriptModule
     /// <summary>
     /// Gets a value indicating whether the client supports picture in picture (PiP).
     /// </summary>
-    /// <param name="videoElementId">The <c>id</c> attribute value for the HTML video
-    /// element, for example; <c>"participant-1"</c></param>
+    /// <param name="selector">The formatted <c>id</c> attribute value-based selector for the HTML video
+    /// element, for example; <c>"#participant-1 > video"</c></param>
     /// <returns><c>true</c> when <c>document.pictureInPictureEnabled</c> or there is
     /// a <c>video</c> HTML element and it hasn't disabled PiP, else <c>false</c>.</returns>
     [JSImport("isPictureInPictureSupported", nameof(SiteJavaScriptModule))]
-    public static partial bool IsPictureInPictureSupported(string videoElement);
+    public static partial bool IsPictureInPictureSupported(string selector);
 
     /// <summary>
-    /// Using the given <paramref name="videoElementId"/>, for example; <c>"participant-1"</c>
+    /// Using the given <paramref name="selector"/>, for example; <c>"#participant-1 > video"</c>
     /// id-based selector for the corresponding HTML video element that we
     /// want to enter picture in picture (PiP) mode.
     /// </summary>
-    /// <param name="videoElementId">The id-based selector for the HTML video element.</param>
+    /// <param name="selector">The id-based selector for the HTML video element.</param>
+    /// <param name="onSuccess">The callback that's invoked when the request set PiP mode.</param>
+    /// <param name="onExited">The callback that's invoked when PiP has exited.</param>
     /// <returns><c>true</c> when the request was successfully sent
     /// to the corresponding <c>HTMLVideoElement</c> instance, else <c>false</c>.</returns>
     [JSImport("requestPictureInPicture", nameof(SiteJavaScriptModule))]
-    public static partial Task<bool> RequestPictureInPictureAsync(string videoElement);
+    public static partial Task<bool> RequestPictureInPictureAsync(
+        string selector,
+        [JSMarshalAs<JSType.Function<JSType.Boolean>>]
+        Action<bool> onSuccess,
+        [JSMarshalAs<JSType.Function>]
+        Action onExited);
 
     /// <summary>
     /// Calls the following corresponding JavaScript
     /// functionality to exit picture in picture (PiP) mode.
     /// </summary>
+    /// <param name="onExited">The callback that's invoked when PiP is exited.</param>
     [JSImport("exitPictureInPicture", nameof(SiteJavaScriptModule))]
-    public static partial Task ExitPictureInPictureAsync();
+    public static partial Task ExitPictureInPictureAsync(
+        [JSMarshalAs<JSType.Function<JSType.Boolean>>]
+        Action<bool> onExited);
 
     /// <summary></summary>
     /// <param name="videoElementId"></param>
