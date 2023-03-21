@@ -5,6 +5,13 @@ namespace Blazing.Twilio.Video.Client.Pages;
 
 public sealed partial class Index : IDisposable
 {
+    /// <summary>The calculated classes for the <c>video</c> HTML elements.</summary>
+    string MidCameraClass =>
+        HideHeader ? "min-vh-85" : "min-vh-55";
+
+    /// <summary>Hide the header when either single size column is not maximized.</summary>
+    bool HideHeader => OneSize is 10 || TwoSize is 10;
+
     /// <summary>The "#participant-1 > video" HTML element.</summary>
     int OneSize =>
         AppState switch
