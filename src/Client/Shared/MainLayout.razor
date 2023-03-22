@@ -12,7 +12,7 @@
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge"
                       Class="d-flex gap-2 justify-center align-content-center flex-grow-1">
-            <CascadingValue Value="AppEvents">
+            <CascadingValue Value="_appEvents">
                 @Body
             </CascadingValue>
         </MudContainer>
@@ -27,7 +27,7 @@
         <MudSpacer />
         @if (AppState.ActiveRoomName is not null)
         {
-            <MudButton Variant="Variant.Filled" 
+            <MudButton Variant="Variant.Filled"
                    StartIcon="@Icons.Material.Filled.ArrowBack"
                    Color="Color.Primary" IconColor="Color.Secondary"
                    Size="Size.Large" title="@(LeaveRoomQuestion)"
@@ -36,10 +36,14 @@
             </MudButton>
         }
         <MudSpacer />
+        @if (AppState.CameraStatus is not CameraStatus.Idle)
+        {
+            <!-- TODO: Add PiP button... -->
+        }
         <MudToggleIconButton @bind-Toggled="@AppState.IsDarkTheme"
                              Title="Switch to Dark Theme"
                              Size="Size.Large" Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit"
-                             ToggledTitle="Switch to Light Theme"
+                             ToggledTitle="Switch to Light Theme" ToggledSize="Size.Large"
                              ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="Color.Inherit" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub"
                        Size="Size.Large" Color="Color.Inherit" Target="_blank"

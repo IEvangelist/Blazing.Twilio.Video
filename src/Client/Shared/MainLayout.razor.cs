@@ -16,12 +16,12 @@ public partial class MainLayout
         Leave "{AppState.ActiveRoomName}" Room?
         """;
 
-    AppEventSubject AppEvents { get; set; }
+    readonly AppEventSubject _appEvents;
 
     HubConnection? _hubConnection;
 
     public MainLayout() =>
-        AppEvents = new(OnAppEventMessageReceived);
+        _appEvents = new(OnAppEventMessageReceived);
 
     protected override async Task OnInitializedAsync()
     {
@@ -158,9 +158,9 @@ public partial class MainLayout
         ShowDialogAsync<RoomDialog>("Available Rooms");
 
     Task ShowDialogAsync<TDialog>(string title) where TDialog : ComponentBase =>
-        Dialog.ShowAsync<TDialog>(title, new DialogParameters()
+        Dialog.ShowAsync<TDialog>(title, new DialogParameters
             {
-                [nameof(AppEvents)] = AppEvents
+                ["AppEvents"] = _appEvents
             });
 }
 

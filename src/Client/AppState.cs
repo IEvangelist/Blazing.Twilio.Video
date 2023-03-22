@@ -60,6 +60,7 @@ public sealed class AppState
     /// <item><c><see cref="CameraStatus.Previewing"/></c>: camera is being previewed.</item>
     /// <item><c><see cref="CameraStatus.RequestingPreview"/></c>: requesting a preview of the camera.</item>
     /// <item><c><see cref="CameraStatus.InCall"/></c>: camera is being used in a call.</item>
+    /// <item><c><see cref="CameraStatus.PictureInPicture"/></c>: camera mode is picture-in-picture.</item>
     /// </list>
     /// </summary>
     public CameraStatus CameraStatus
