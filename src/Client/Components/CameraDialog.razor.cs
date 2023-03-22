@@ -73,7 +73,7 @@ public sealed partial class CameraDialog : IDisposable
         MudDialog.Close(DialogResult.Ok(true));
         AppEvents.TriggerAppEvent(new AppEventMessage(
             Value: _selectedCameraId!,
-            MessageType: MessageType.CameraSelected));
+            MessageType: MessageType.SelectCamera));
     }
 
     void Cancel()

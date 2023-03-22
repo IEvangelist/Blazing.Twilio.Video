@@ -44,8 +44,8 @@ public sealed class AppState
             if (_selectedCameraId != value)
             {
                 _logger.LogInformation(
-                    "AppState.{SelectedCameraId} changed (Was: {CameraId}, Now: {Value})",
-                    nameof(SelectedCameraId), _selectedCameraId, value);
+                    "⚙️ Changed: AppState.SelectedCameraId = {Value} (Was: {CameraId})",
+                    value, _selectedCameraId);
 
                 _storage.SetItem(StorageKeys.CameraDeviceId, _selectedCameraId = value);
                 StateChanged?.Invoke(nameof(SelectedCameraId));

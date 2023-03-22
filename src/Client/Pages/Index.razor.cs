@@ -28,11 +28,11 @@ public sealed partial class Index : IDisposable
         };
 
     /// <summary>Is <c>"hidden"</c> when <see cref="OneSize"/> is <c>0</c>.
-    /// Otherwise, <c>"min-vh-55"</c> is returned.</summary>
+    /// Otherwise, <see cref="MidCameraClass"/> is returned.</summary>
     string OneClass => OneSize switch
     {
         0 => "hidden",
-        _ => "min-vh-55"
+        _ => MidCameraClass
     };
 
     /// <summary>The "#participant-2 > video" HTML element.</summary>
@@ -40,7 +40,8 @@ public sealed partial class Index : IDisposable
         AppState switch
         {
             { CameraStatus: CameraStatus.PictureInPicture } => 10,
-            { CameraStatus:
+            {
+                CameraStatus:
                 CameraStatus.Idle or
                 CameraStatus.InCall or
                 CameraStatus.RequestingPreview or
@@ -50,11 +51,11 @@ public sealed partial class Index : IDisposable
         };
 
     /// <summary>Is <c>"hidden"</c> when <see cref="TwoSize"/> is <c>0</c>.
-    /// Otherwise, <c>"min-vh-55"</c> is returned.</summary>
+    /// Otherwise, <see cref="MidCameraClass"/> is returned.</summary>
     string TwoClass => TwoSize switch
     {
         0 => "hidden",
-        _ => "min-vh-55"
+        _ => MidCameraClass
     };
 
     [Inject] public required AppState AppState { get; set; }
@@ -63,7 +64,7 @@ public sealed partial class Index : IDisposable
 
     [CascadingParameter]
     public required AppEventSubject AppEvents { get; set; }
-    
+
     protected override void OnInitialized()
     {
         AppState.StateChanged += OnStateHasChanged;
@@ -73,7 +74,13 @@ public sealed partial class Index : IDisposable
     {
         if (firstRender is false && AppState.SelectedCameraId is { } deviceId)
         {
-            if (AppState is { CameraStatus: CameraStatus.PictureInPicture or CameraStatus.InCall })
+            if (AppState is
+                {
+                    CameraStatus:
+                        CameraStatus.PictureInPicture or
+                        CameraStatus.InCall or
+                        CameraStatus.Previewing
+                })
             {
                 return;
             }
@@ -98,8 +105,10 @@ public sealed partial class Index : IDisposable
             _ => "Unknown"
         };
 
-        Logger.LogInformation("⚙️ Changed: AppState.{AppStatePropertyName} = {Value}",
+        Logger.LogInformation("✅ Changed: AppState.{AppStatePropertyName} = {Value}",
             appStatePropertyName, value);
+
+        StateHasChanged();
     }
 
     void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;

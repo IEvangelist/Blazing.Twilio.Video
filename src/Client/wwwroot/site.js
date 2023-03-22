@@ -2,6 +2,7 @@
 let _audioTrack = null;
 let _activeRoom = null;
 let _participants = new Map();
+let _isAttemptingToStartVideo = false;
 let _dominantSpeaker = null;
 
 /*
@@ -47,19 +48,11 @@ function waitForElement(selector) {
             return resolve(element);
         }
 
-        const observer = new MutationObserver(mutations => {
+        const observer = new MutationObserver(_ => {
             const elem = document.querySelector(selector);
             if (elem) {
                 resolve(elem);
                 observer.disconnect();
-            }
-
-            if (mutations) {
-                mutations.forEach(m => {
-                    console.log(
-                        `${m.attributeName} (${m.attributeNamespace}) added ${m.addedNodes.length} nodes.`
-                    );
-                });
             }
         });
 
@@ -71,11 +64,17 @@ function waitForElement(selector) {
 }
 
 export async function startVideo(deviceId, selector) {
+    if (_isAttemptingToStartVideo === true) {
+        return;
+    }
+
+    _isAttemptingToStartVideo = true;
+
     const cameraContainer = await waitForElement(selector);
     if (!cameraContainer) {
         const errorMessage = `Unable to get HTML element matching ${selector}`;
         console.log(errorMessage);
-        return false;
+        return _isAttemptingToStartVideo = false;
     }
 
     try {
@@ -90,7 +89,9 @@ export async function startVideo(deviceId, selector) {
         cameraContainer.append(videoEl);
     } catch (error) {
         console.log(error);
-        return false;
+        return _isAttemptingToStartVideo = false;
+    } finally {
+        _isAttemptingToStartVideo = false;
     }
 
     return true;
@@ -247,17 +248,17 @@ export async function requestPictureInPicture(selector, onSuccess, onExited) {
 
     const videoElement = await waitForElement(selector);
     if (videoElement) {
-        videoElement.addEventListener("enterpictureinpicture", e => {
+        videoElement.onenterpictureinpicture = () => {
             if (onSuccess) {
                 onSuccess(true);
             }
-        });
+        };
 
-        videoElement.addEventListener("leavepictureinpicture", e => {
+        videoElement.onleavepictureinpicture = () => {
             if (onExited) {
                 onExited();
             }
-        });
+        };
 
         const pipWindow = await videoElement.requestPictureInPicture();
         try {

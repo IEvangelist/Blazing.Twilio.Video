@@ -89,7 +89,7 @@ public sealed partial class RoomDialog : IDisposable
         AppEvents.TriggerAppEvent(new AppEventMessage(
             Value: roomName,
             TwilioToken: jwt.Token,
-            MessageType: MessageType.RoomCreatedOrJoined));
+            MessageType: MessageType.CreateOrJoinRoom));
 
         return true;
     }

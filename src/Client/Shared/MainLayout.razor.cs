@@ -58,56 +58,62 @@ public partial class MainLayout
                             options.IconSize = Size.Large;
                         });
                 }
+                else
+                {
+                    Logger.LogWarning("Unable to exit PiP mode.");
+                }
             });
         }
     }
 
     async Task OnAppEventMessageReceived(AppEventMessage eventMessage)
     {
-        Logger.LogInformation(
-            "⚡ App event message: {Type}", eventMessage.MessageType);
-
-        if (eventMessage.MessageType is MessageType.LeftRoom)
+        await InvokeAsync(async () =>
         {
-            TryLeaveRoom();
-            return;
-        }
+            Logger.LogInformation(
+                "⚡ App event message: {Type} (Payload: {Value})",
+                eventMessage.MessageType, eventMessage.Value);
 
-        if (_hubConnection is not null &&
-            eventMessage.MessageType is MessageType.RoomCreatedOrJoined)
-        {
-            await SiteJavaScriptModule.CreateOrJoinRoomAsync(
-                eventMessage.Value, eventMessage.TwilioToken!);
+            if (eventMessage.MessageType is MessageType.LeaveRoom)
+            {
+                TryLeaveRoom();
+                return;
+            }
 
-            await SiteJavaScriptModule.RequestPictureInPictureAsync(
-                selector: $"""
-                {ElementIds.ParticipantOne} > video
-                """,
-                isPictureInPicture =>
-                {
-                    // TODO: Always seems false, even though it worked?!
-                    // if (isPictureInPicture)
+            if (_hubConnection is not null &&
+                eventMessage.MessageType is MessageType.CreateOrJoinRoom)
+            {
+                await SiteJavaScriptModule.CreateOrJoinRoomAsync(
+                    eventMessage.Value, eventMessage.TwilioToken!);
+
+                await SiteJavaScriptModule.RequestPictureInPictureAsync(
+                    selector: $"""
+                    {ElementIds.ParticipantOne} > video
+                    """,
+                    isPictureInPicture =>
                     {
-                        AppState.CameraStatus = CameraStatus.PictureInPicture;
-                    }
-                },
-                onExited: () => AppState.CameraStatus = CameraStatus.InCall);
+                        if (isPictureInPicture)
+                        {
+                            AppState.CameraStatus = CameraStatus.PictureInPicture;
+                        }
+                        Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
+                    },
+                    onExited: () => AppState.CameraStatus = CameraStatus.InCall);
 
-            await _hubConnection.InvokeAsync(
-                HubEventNames.RoomsUpdated,
-                AppState.ActiveRoomName = eventMessage.Value);
+                await _hubConnection.InvokeAsync(
+                    HubEventNames.RoomsUpdated,
+                    AppState.ActiveRoomName = eventMessage.Value);
+            }
 
-            return;
-        }
-
-        //if (eventMessage.MessageType is MessageType.CameraSelected &&
-        //    (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
-        //{
-        //    if (await SiteJavaScriptModule.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
-        //    {
-        //        AppState.CameraStatus = CameraStatus.InCall;
-        //    }
-        //}
+            //if (eventMessage.MessageType is MessageType.SelectCamera &&
+            //    (AppState.SelectedCameraId = eventMessage.Value) is { } deviceId)
+            //{
+            //    if (await SiteJavaScriptModule.StartVideoAsync(deviceId, ElementIds.ParticipantOne))
+            //    {
+            //        AppState.CameraStatus = CameraStatus.InCall;
+            //    }
+            //}
+        });
     }
 
     Task OnRoomAdded(string roomName) =>
@@ -129,9 +135,8 @@ public partial class MainLayout
                 });
         });
 
-    Task OnUserConnected(string message)
-    {
-        return InvokeAsync(() =>
+    Task OnUserConnected(string message) =>
+        InvokeAsync(() =>
         {
             const string template = LogMessageTemplates.OnUserConnected;
 
@@ -145,7 +150,6 @@ public partial class MainLayout
                     options.IconSize = Size.Large;
                 });
         });
-    }
 
     Task OpenCameraDialog() =>
         ShowDialogAsync<CameraDialog>("Camera Preferences");
@@ -153,19 +157,11 @@ public partial class MainLayout
     Task OpenRoomDialog() =>
         ShowDialogAsync<RoomDialog>("Available Rooms");
 
-    async Task ShowDialogAsync<TDialog>(string title) where TDialog : ComponentBase
-    {
-        var dialogReference =
-            await Dialog.ShowAsync<TDialog>(title, new DialogParameters()
+    Task ShowDialogAsync<TDialog>(string title) where TDialog : ComponentBase =>
+        Dialog.ShowAsync<TDialog>(title, new DialogParameters()
             {
                 [nameof(AppEvents)] = AppEvents
             });
-
-        if (await dialogReference.Result is { Canceled: false })
-        {
-            StateHasChanged();
-        }
-    }
 }
 
 file static class LogMessageTemplates

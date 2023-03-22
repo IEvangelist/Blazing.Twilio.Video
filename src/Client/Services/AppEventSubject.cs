@@ -43,7 +43,12 @@ public readonly record struct AppEventMessage(
 
 public enum MessageType
 {
-    CameraSelected,
-    RoomCreatedOrJoined,
-    LeftRoom
+    /// <summary> The user is selecting a camera.</summary>
+    SelectCamera,
+
+    /// <summary>The user is creating or joining a room.</summary>
+    CreateOrJoinRoom,
+
+    /// <summary>The user is leaving the room.</summary>
+    LeaveRoom
 };
