@@ -43,7 +43,7 @@ public sealed partial class MainLayout : IDisposable
     {
         if (SiteJavaScriptModule.LeaveRoom())
         {
-            _ = SiteJavaScriptModule.ExitPictureInPictureAsync(exited =>
+            _ = SiteJavaScriptModule.ExitPictureInPictureAsync(onExited: exited =>
             {
                 if (exited)
                 {
@@ -82,7 +82,7 @@ public sealed partial class MainLayout : IDisposable
                     {
                         AppState.CameraStatus = CameraStatus.PictureInPicture;
                     }
-                    Logger.LogInformation("Entered PiP: {Value}", toggleOn);
+                    Logger.LogInformation("Entered PiP: {Value}", isPiP);
                 },
                 onExited: () => AppState.CameraStatus = AppState.PreviousCameraStatus);
         }
