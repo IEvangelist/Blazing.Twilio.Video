@@ -85,8 +85,8 @@ export async function startVideo(deviceId, selector) {
         }
 
         _videoTrack = await Twilio.Video.createLocalVideoTrack({ deviceId });
-        const videoEl = _videoTrack.attach();
-        cameraContainer.append(videoEl);
+        const videoElement = _videoTrack.attach();
+        cameraContainer.append(videoElement);
     } catch (error) {
         console.log(error);
         return _isAttemptingToStartVideo = false;
@@ -151,10 +151,6 @@ export async function createOrJoinRoom(roomName, token) {
     }
 
     return !!_activeRoom;
-}
-
-export function log(message, args) {
-    console.log(message, ...args);
 }
 
 const initialize = (participants) => {
@@ -260,25 +256,27 @@ export async function requestPictureInPicture(selector, onSuccess, onExited) {
             }
         };
 
-        const pipWindow = await videoElement.requestPictureInPicture();
         try {
+            const pipWindow = await videoElement.requestPictureInPicture();
             if (pipWindow) {
-
-                const log = () => {
+                const logWindowDimensions = () => {
                     console.log(`PiP window is ${pipWindow.width}x${pipWindow.height}`);
                 };
 
-                log();
-                pipWindow.onresize = log;
+                logWindowDimensions();
+                pipWindow.onresize = logWindowDimensions;
 
             }
         } catch {
             // Not a big deal... 🙄
+            if (onSuccess) {
+                onSuccess(false);
+            }
         }
     }
 }
 
-export async function isPictureInPictureSupported(selector) {
+async function isPictureInPictureSupported(selector) {
     const videoElement = await waitForElement(selector);
     if (!videoElement) {
         const errorMessage = `Unable to get HTML video element matching ${selector}`;

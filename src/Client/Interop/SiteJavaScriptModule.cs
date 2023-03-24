@@ -4,7 +4,7 @@
 namespace Blazing.Twilio.Video.Client.Interop;
 
 /// <summary>
-/// The JavaScript interop <c>site.js</c> module representation.
+/// The JavaScript interop <c>blazing-video.js</c> module representation.
 /// </summary>
 internal sealed partial class SiteJavaScriptModule
 {
@@ -55,20 +55,10 @@ internal sealed partial class SiteJavaScriptModule
     /// </summary>
     /// <param name="message">Message or message template.</param>
     /// <param name="args">The various style arguments.</param>
-    [JSImport("log", nameof(SiteJavaScriptModule))]
+    [JSImport("globalThis.console.log", nameof(SiteJavaScriptModule))]
     public static partial void LogInfo(
         string message,
         [JSMarshalAs<JSType.Array<JSType.Any>>] object?[] args);
-
-    /// <summary>
-    /// Gets a value indicating whether the client supports picture in picture (PiP).
-    /// </summary>
-    /// <param name="selector">The formatted <c>id</c> attribute value-based selector for the HTML video
-    /// element, for example; <c>"#participant-1 > video"</c></param>
-    /// <returns><c>true</c> when <c>document.pictureInPictureEnabled</c> or there is
-    /// a <c>video</c> HTML element and it hasn't disabled PiP, else <c>false</c>.</returns>
-    [JSImport("isPictureInPictureSupported", nameof(SiteJavaScriptModule))]
-    public static partial bool IsPictureInPictureSupported(string selector);
 
     /// <summary>
     /// Using the given <paramref name="selector"/>, for example; <c>"#participant-1 > video"</c>
@@ -83,10 +73,8 @@ internal sealed partial class SiteJavaScriptModule
     [JSImport("requestPictureInPicture", nameof(SiteJavaScriptModule))]
     public static partial Task<bool> RequestPictureInPictureAsync(
         string selector,
-        [JSMarshalAs<JSType.Function<JSType.Boolean>>]
-        Action<bool> onSuccess,
-        [JSMarshalAs<JSType.Function>]
-        Action onExited);
+        [JSMarshalAs<JSType.Function<JSType.Boolean>>] Action<bool> onSuccess,
+        [JSMarshalAs<JSType.Function>] Action onExited);
 
     /// <summary>
     /// Calls the following corresponding JavaScript
@@ -95,14 +83,5 @@ internal sealed partial class SiteJavaScriptModule
     /// <param name="onExited">The callback that's invoked when PiP is exited.</param>
     [JSImport("exitPictureInPicture", nameof(SiteJavaScriptModule))]
     public static partial Task ExitPictureInPictureAsync(
-        [JSMarshalAs<JSType.Function<JSType.Boolean>>]
-        Action<bool> onExited);
-
-    /// <summary></summary>
-    /// <param name="videoElementId"></param>
-    partial void OnVideoElementEnteredPictureInPicture(string videoElementId);
-
-    /// <summary></summary>
-    /// <param name="videoElementId"></param>
-    partial void OnVideoElementLeavePictureInPicture(string videoElementId);
+        [JSMarshalAs<JSType.Function<JSType.Boolean>>] Action<bool> onExited);
 }

@@ -4,7 +4,7 @@
 if (!OperatingSystem.IsBrowser())
 {
     throw new PlatformNotSupportedException("""
-        This app only supports running in the browser!
+        The Blazing Chat app only supports running in the browser!
         """);
 }
 
@@ -22,7 +22,7 @@ builder.Services.AddLocalStorageServices();
 builder.Services.AddMudServices();
 
 await JSHost.ImportAsync(
-    nameof(SiteJavaScriptModule), $"../site.js?{Guid.NewGuid()}");
+    moduleName: nameof(SiteJavaScriptModule), moduleUrl: $"../blazing-video.js?{Guid.NewGuid()}");
 
 var app = builder.Build();
 await app.RunAsync();

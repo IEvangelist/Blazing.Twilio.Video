@@ -36,9 +36,13 @@
             </MudButton>
         }
         <MudSpacer />
-        @if (AppState.CameraStatus is not CameraStatus.Idle)
+        @if (AppState is not { CameraStatus: CameraStatus.Idle })
         {
-            <!-- TODO: Add PiP button... -->
+            <MudToggleIconButton Toggled="@(AppState.CameraStatus is CameraStatus.PictureInPicture)"
+                                 Title="Enter picture-in-picture mode" ToggledChanged=@OnPictureInPictureChanged
+                                 Size="Size.Large" Icon="@Icons.Material.Filled.PictureInPictureAlt" Color="Color.Inherit"
+                                 ToggledTitle="Exit picture-in-picture mode" ToggledSize="Size.Large"
+                                 ToggledIcon="@Icons.Material.Filled.FitScreen" ToggledColor="Color.Inherit" />
         }
         <MudToggleIconButton @bind-Toggled="@AppState.IsDarkTheme"
                              Title="Switch to Dark Theme"

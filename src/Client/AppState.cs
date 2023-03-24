@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazing.Twilio.Video.Shared;
-
 namespace Blazing.Twilio.Video.Client;
 
 /// <summary>
@@ -22,7 +20,7 @@ public sealed class AppState
     /// <summary>
     /// An event that is fired when the app state has changed.
     /// </summary>
-    public event Action<string>? StateChanged;
+    public event Action? StateChanged;
 
     public AppState(ILocalStorageService storage, ILogger<AppState> logger) =>
         (_storage, _logger) = (storage, logger);
@@ -48,7 +46,7 @@ public sealed class AppState
                     value, _selectedCameraId);
 
                 _storage.SetItem(StorageKeys.CameraDeviceId, _selectedCameraId = value);
-                StateChanged?.Invoke(nameof(SelectedCameraId));
+                StateChanged?.Invoke();
             }
         }
     }
@@ -70,15 +68,22 @@ public sealed class AppState
         {
             if (_cameraStatus != value)
             {
+                PreviousCameraStatus = _cameraStatus;
+
                 _logger.LogInformation(
                     "⚙️ Changed: AppState.CameraStatus = {Value} (Was: {Status})",
                     value, _cameraStatus);
 
                 _cameraStatus = value;
-                StateChanged?.Invoke(nameof(CameraStatus));
+                StateChanged?.Invoke();
             }
         }
     }
+
+    /// <summary>
+    /// Gets the previous camera status (when available is the camera status before <see cref="CameraStatus"/>).
+    /// </summary>
+    internal CameraStatus PreviousCameraStatus { get; private set; }
 
     /// <summary>
     /// Gets or sets whether dark-theme is preferred.
@@ -96,7 +101,7 @@ public sealed class AppState
                     value, _isDarkTheme);
 
                 _storage.SetItem(StorageKeys.PrefersDarkTheme, _isDarkTheme = value);
-                StateChanged?.Invoke(nameof(IsDarkTheme));
+                StateChanged?.Invoke();
             }
         }
     }
@@ -117,7 +122,7 @@ public sealed class AppState
                     value, _activeRoomName);
 
                 _activeRoomName = value;
-                StateChanged?.Invoke(nameof(ActiveRoomName));
+                StateChanged?.Invoke();
             }
         }
     }
@@ -133,7 +138,7 @@ public sealed class AppState
         set
         {
             _rooms = value;
-            StateChanged?.Invoke(nameof(Rooms));
+            StateChanged?.Invoke();
         }
     }
 }

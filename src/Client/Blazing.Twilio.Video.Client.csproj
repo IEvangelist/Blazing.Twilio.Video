@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\site.js" />
+    <None Include="wwwroot\blazing-video.js" />
   </ItemGroup>
 
   <ItemGroup>
