@@ -195,3 +195,5 @@ video {
 .hidden {
     display: none;
 }
+
+video.is-dominant

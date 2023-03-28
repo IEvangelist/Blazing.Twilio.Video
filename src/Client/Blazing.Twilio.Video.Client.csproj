@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\blazing-video.js" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Blazor.LocalStorage.WebAssembly" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.3" PrivateAssets="all" />
@@ -25,8 +21,16 @@
     <ProjectReference Include="..\Shared\Blazing.Twilio.Video.Shared.csproj" />
   </ItemGroup>
 
-  <!--<ItemGroup>
-    <WasmExtraFilesToDeploy Include="wwwroot\site.js" />
-  </ItemGroup>-->
+  <ItemGroup>
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\attachTrack.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\detachTrack.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\exitPictureInPicture.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\isFunctionDefined.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\isPictureInPictureSupported.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\registerParticipantEvents.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\requestPictureInPicture.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\subscribeToPublication.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\waitForElement.js" />
+  </ItemGroup>
 
 </Project>

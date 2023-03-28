@@ -3,46 +3,31 @@
 
 namespace Blazing.Twilio.Video.Client.Components;
 
-public sealed partial class RoomDialog : IDisposable
+public sealed partial class RoomDialog
 {
     bool _isLoading = true;
     string? _roomName;
     MudListItem? _selectedRoom;
 
-    [Inject]
-    public required HttpClient Http { get; set; }
+    [Inject] public required HttpClient Http { get; set; }
 
-    [Inject]
-    public required AppState AppState { get; set; }
+    [Inject] public required AppState AppState { get; set; }
 
     [Inject] public required ILogger<RoomDialog> Logger { get; set; }
 
-    [Parameter]
-    public required AppEventSubject AppEvents { get; set; }
+    [Parameter] public required AppEventSubject AppEvents { get; set; }
 
-    [CascadingParameter]
-    public required MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] public required MudDialogInstance MudDialog { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Logger.LogInformation("Initializing...");
-
         AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
             ?? new();
-        AppState.StateChanged += OnStateHasChanged;
 
         _isLoading = false;
     }
 
     void Ok() => MudDialog.Close(DialogResult.Ok(true));
-
-    void OnStateHasChanged(string appStatePropertyName)
-    {
-        if (appStatePropertyName is nameof(AppState.Rooms))
-        {
-            StateHasChanged();
-        }
-    }
 
     async ValueTask TryAddRoom(object args)
     {
@@ -53,7 +38,10 @@ public sealed partial class RoomDialog : IDisposable
 
         var takeAction = args switch
         {
-            KeyboardEventArgs keyboard when keyboard.Key is "Enter" => true,
+            KeyboardEventArgs keyboard
+            when keyboard.Key.Equals(
+                "Enter", StringComparison.OrdinalIgnoreCase) => true,
+
             MouseEventArgs => true,
             _ => false
         };
@@ -65,6 +53,12 @@ public sealed partial class RoomDialog : IDisposable
             {
                 Logger.LogInformation("Added or joined {room}", _roomName);
                 _roomName = null;
+
+                // Let the UI update enough to let the user know the
+                // room was created/joined, before closing the modal.
+                await Task.Delay(300);
+
+                Ok();
             }
             else
             {
@@ -93,6 +87,4 @@ public sealed partial class RoomDialog : IDisposable
 
         return true;
     }
-
-    void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;
 }

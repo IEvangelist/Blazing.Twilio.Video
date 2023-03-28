@@ -1,16 +1,7 @@
 ﻿@page "/"
 
-<!--
-    TODO NOTES:
-
-    1. Fix issue where start video is called more than needed.
-    2. Adjust styling when you're not in a room, i.e.; full mode.
-    3. When participant joins, make their feed full, and mine PiP.
-       - Exiting PiP, makes the video go side-by-side.
--->
-
 <MudGrid Justify="Justify.Center" Class="gap-4">
-    <MudItem xs="10" Class="@(HideHeader ? "hidden" : "")">
+    <MudItem xs="10" Class="@HeaderClass">
         <MudPaper Elevation="10" Class="pa-4" Style="background-color: var(--mud-palette-dark)">
             <MudGrid Justify="Justify.Center" Class="gap-4 align-content-center justify-center">
                 <MudItem xs="1" Class="d-flex pb-2">

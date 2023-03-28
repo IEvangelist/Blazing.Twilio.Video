@@ -9,9 +9,11 @@ namespace Blazing.Twilio.Video.Client.Interop;
 internal sealed partial class SiteJavaScriptModule
 {
     /// <summary>
-    /// Gets an array of video devices from the browser.
+    /// Gets an array of video devices from the browser as either an
+    /// empty array string, or string value that JSON deserializes into
+    /// an array of <see cref="Device"/>.
     /// </summary>
-    /// <returns>An array of <see cref="Device"/> objects.</returns>
+    /// <returns>An array of <see cref="Device"/> objects as a JSON string.</returns>
     /// <remarks>This will never return <c>null</c>, instead it will
     /// return an empty array <see cref="Device[]"/>.</remarks>
     [JSImport("requestVideoDevices", nameof(SiteJavaScriptModule))]

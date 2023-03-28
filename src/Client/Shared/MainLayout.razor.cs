@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Shared;
+
 namespace Blazing.Twilio.Video.Client.Shared;
 
 public sealed partial class MainLayout : IDisposable
@@ -86,20 +88,17 @@ public sealed partial class MainLayout : IDisposable
                 },
                 onExited: () => AppState.CameraStatus = AppState.PreviousCameraStatus);
         }
-        else
+        else await SiteJavaScriptModule.ExitPictureInPictureAsync(onExited: exited =>
         {
-            await SiteJavaScriptModule.ExitPictureInPictureAsync(onExited: exited =>
+            if (exited && AppState is { CameraStatus: CameraStatus.PictureInPicture })
             {
-                if (exited && AppState is { CameraStatus: CameraStatus.PictureInPicture })
-                {
-                    AppState.CameraStatus = AppState.PreviousCameraStatus;
-                }
-                else
-                {
-                    Logger.LogWarning("☹️ Unable to exit picture-in-picture mode.");
-                }
-            });
-        }
+                AppState.CameraStatus = AppState.PreviousCameraStatus;
+            }
+            else
+            {
+                Logger.LogWarning("☹️ Unable to exit picture-in-picture mode.");
+            }
+        });
     }
 
     async Task OnAppEventMessageReceived(AppEventMessage eventMessage)
@@ -119,24 +118,49 @@ public sealed partial class MainLayout : IDisposable
             if (_hubConnection is not null &&
                 eventMessage.MessageType is MessageType.CreateOrJoinRoom)
             {
-                await SiteJavaScriptModule.CreateOrJoinRoomAsync(
-                    eventMessage.Value, eventMessage.TwilioToken!);
-
-                await SiteJavaScriptModule.RequestPictureInPictureAsync(
-                    selector: ElementSelectors.ParticipantOneId.AsVideoSelector(),
-                    isPictureInPicture =>
-                    {
-                        if (isPictureInPicture)
+                if (await SiteJavaScriptModule.CreateOrJoinRoomAsync(
+                    eventMessage.Value, eventMessage.TwilioToken!))
+                {
+                    await SiteJavaScriptModule.RequestPictureInPictureAsync(
+                        selector: ElementSelectors.ParticipantOneId.AsVideoSelector(),
+                        isPictureInPicture =>
                         {
-                            AppState.CameraStatus = CameraStatus.PictureInPicture;
-                        }
-                        Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
-                    },
-                    onExited: () => AppState.CameraStatus = CameraStatus.InCall);
+                            if (isPictureInPicture)
+                            {
+                                AppState.CameraStatus = CameraStatus.PictureInPicture;
+                            }
+                            Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
+                        },
+                        onExited: () => AppState.CameraStatus = CameraStatus.InCall);
 
-                await _hubConnection.InvokeAsync(
-                    HubEventNames.RoomsUpdated,
-                    AppState.ActiveRoomName = eventMessage.Value);
+                    await _hubConnection.InvokeAsync(
+                        HubEventNames.RoomsUpdated,
+                        AppState.ActiveRoomName = eventMessage.Value);
+                }
+            }
+
+            if (eventMessage.MessageType is MessageType.SelectCamera &&
+                AppState.SelectedCameraId is { } deviceId)
+            {
+                if (AppState is
+                    {
+                        CameraStatus:
+                            CameraStatus.PictureInPicture or
+                            CameraStatus.InCall or
+                            CameraStatus.Previewing
+                    })
+                {
+                    return;
+                }
+
+                var selector = AppState is { CameraStatus: CameraStatus.RequestingPreview }
+                    ? ElementSelectors.CameraPreviewId
+                    : ElementSelectors.ParticipantOneId;
+
+                if (await SiteJavaScriptModule.StartVideoAsync(deviceId, selector))
+                {
+                    AppState.CameraStatus = CameraStatus.InCall;
+                }
             }
         });
     }
@@ -165,7 +189,7 @@ public sealed partial class MainLayout : IDisposable
         {
             const string template = LogMessageTemplates.OnUserConnected;
 
-            Logger.LogInformation(LogMessageTemplates.OnUserConnected, message);
+            Logger.LogInformation(template, message);
             Snackbar.Add(
                 template.Replace("{Message}", message),
                 Severity.Error,
@@ -184,9 +208,9 @@ public sealed partial class MainLayout : IDisposable
 
     Task ShowDialogAsync<TDialog>(string title) where TDialog : ComponentBase =>
         Dialog.ShowAsync<TDialog>(title, new DialogParameters
-            {
-                ["AppEvents"] = _appEvents
-            });
+        {
+            ["AppEvents"] = _appEvents
+        });
 }
 
 file static class LogMessageTemplates

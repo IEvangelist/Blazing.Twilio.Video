@@ -12,11 +12,9 @@ public sealed partial class CameraDialog : IDisposable
 
     [Inject] public required ILogger<CameraDialog> Logger { get; set; }
 
-    [Parameter]
-    public required AppEventSubject AppEvents { get; set; }
+    [Parameter] public required AppEventSubject AppEvents { get; set; }
 
-    [CascadingParameter]
-    public required MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] public required MudDialogInstance MudDialog { get; set; }
 
     Device[]? Devices { get; set; }
     RequestCameraState State { get; set; }
@@ -27,12 +25,12 @@ public sealed partial class CameraDialog : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        Logger.LogInformation("Initializing...");
-
         AppState.CameraStatus = CameraStatus.RequestingPreview;
         var json = await SiteJavaScriptModule.RequestVideoDevicesAsync();
-        Logger.LogInformation("Devices: {Json}", json);
-        Devices = json.FromJson<Device[]>(new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? Array.Empty<Device>();
+        Logger.LogInformation("🎥 Devices: {Json}", json);
+        Devices = json.FromJson<Device[]>(
+            new JsonSerializerOptions(JsonSerializerDefaults.Web))
+            ?? Array.Empty<Device>();
         State = Devices switch
         {
             null or { Length: 0 } => RequestCameraState.Error,
@@ -52,6 +50,8 @@ public sealed partial class CameraDialog : IDisposable
                 {
                     AppState.CameraStatus = CameraStatus.RequestingPreview;
                 }
+                else Logger.LogInformation(
+                    "❔ Unable to evaluate (PiP) {Exited} as `true`.", exited);
             });
     }
 
@@ -70,6 +70,8 @@ public sealed partial class CameraDialog : IDisposable
 
     void SaveCameraSelection()
     {
+        SiteJavaScriptModule.StopVideo();
+        AppState.CameraStatus = CameraStatus.Idle;
         MudDialog.Close(DialogResult.Ok(true));
         AppEvents.TriggerAppEvent(new AppEventMessage(
             Value: _selectedCameraId!,

@@ -1,4 +1,10 @@
-﻿let _videoTrack = null;
+﻿import { requestPictureInPicture } from "./requestPictureInPicture.js"
+import { exitPictureInPicture } from "./exitPictureInPicture.js";
+import { waitForElement } from "./waitForElement.js";
+import { registerParticipantEvents } from "./registerParticipantEvents.js";
+import { detachTrack } from "./detachTrack.js";
+
+let _videoTrack = null;
 let _audioTrack = null;
 let _activeRoom = null;
 let _participants = new Map();
@@ -39,28 +45,6 @@ export async function requestVideoDevices() {
     }
 
     return JSON.stringify([]);
-}
-
-function waitForElement(selector) {
-    return new Promise(resolve => {
-        const element = document.querySelector(selector);
-        if (element) {
-            return resolve(element);
-        }
-
-        const observer = new MutationObserver(_ => {
-            const elem = document.querySelector(selector);
-            if (elem) {
-                resolve(elem);
-                observer.disconnect();
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    });
 }
 
 export async function startVideo(deviceId, selector) {
@@ -177,47 +161,6 @@ const loudest = (participant) => {
     _dominantSpeaker = participant;
 };
 
-const registerParticipantEvents = (participant, isLocal) => {
-    if (participant) {
-        participant.tracks.forEach(publication => subscribe(publication, isLocal));
-        participant.on('trackPublished', publication => subscribe(publication, isLocal));
-        participant.on('trackUnpublished',
-            publication => {
-                if (publication && publication.track) {
-                    detachRemoteTrack(publication.track);
-                }
-            });
-    }
-};
-
-const subscribe = (publication, isLocal) => {
-    if (isFunctionDefined(publication, 'on')) {
-        publication.on('subscribed', track => attachTrack(track, isLocal));
-        publication.on('unsubscribed', track => detachTrack(track));
-    }
-};
-
-const attachTrack = (track, isLocal) => {
-    if (isFunctionDefined(track, 'attach')) {
-        const audioOrVideo = track.attach();
-        audioOrVideo.id = track.sid;
-
-        document.getElementById(`participant-${isLocal ? '1' : '2'}`)
-            .appendChild(audioOrVideo);
-    }
-};
-
-const detachTrack = (track) => {
-    if (isFunctionDefined(track, 'detach')) {
-        track.detach()
-            .forEach(el => el.remove());
-    }
-};
-
-const isFunctionDefined = (instance, member) => {
-    return !!instance && typeof instance[member] === 'function';
-};
-
 export function leaveRoom() {
     try {
         if (_activeRoom) {
@@ -237,67 +180,7 @@ export function leaveRoom() {
     return true;
 }
 
-export async function requestPictureInPicture(selector, onSuccess, onExited) {
-    if (!await isPictureInPictureSupported(selector)) {
-        console.log(`Picture-in-Picture isn't supported on this browser on element: ${selector}`);
-    }
-
-    const videoElement = await waitForElement(selector);
-    if (videoElement) {
-        videoElement.onenterpictureinpicture = () => {
-            if (onSuccess) {
-                onSuccess(true);
-            }
-        };
-
-        videoElement.onleavepictureinpicture = () => {
-            if (onExited) {
-                onExited();
-            }
-        };
-
-        try {
-            const pipWindow = await videoElement.requestPictureInPicture();
-            if (pipWindow) {
-                const logWindowDimensions = () => {
-                    console.log(`PiP window is ${pipWindow.width}x${pipWindow.height}`);
-                };
-
-                logWindowDimensions();
-                pipWindow.onresize = logWindowDimensions;
-
-            }
-        } catch {
-            // Not a big deal... 🙄
-            if (onSuccess) {
-                onSuccess(false);
-            }
-        }
-    }
-}
-
-async function isPictureInPictureSupported(selector) {
-    const videoElement = await waitForElement(selector);
-    if (!videoElement) {
-        const errorMessage = `Unable to get HTML video element matching ${selector}`;
-        console.log(errorMessage);
-        return false;
-    }
-
-    return document.pictureInPictureEnabled
-        && videoElement.disablePictureInPicture === false;
-}
-
-export async function exitPictureInPicture(onExited) {
-    let exited = false;
-    try {
-        if (document.pictureInPictureElement) {
-            await document.exitPictureInPicture();
-            exited = true;
-        }
-    } finally {
-        if (onExited) {
-            onExited(exited);
-        }
-    }
-}
+export {
+    requestPictureInPicture,
+    exitPictureInPicture
+};

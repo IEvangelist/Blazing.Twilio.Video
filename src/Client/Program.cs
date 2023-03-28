@@ -22,7 +22,7 @@ builder.Services.AddLocalStorageServices();
 builder.Services.AddMudServices();
 
 await JSHost.ImportAsync(
-    moduleName: nameof(SiteJavaScriptModule), moduleUrl: $"../blazing-video.js?{Guid.NewGuid()}");
+    moduleName: nameof(SiteJavaScriptModule), moduleUrl: $"../js/blazing-video.js?{Guid.NewGuid()}");
 
 var app = builder.Build();
 await app.RunAsync();

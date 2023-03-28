@@ -24,7 +24,7 @@ public sealed class AppEventSubject : IDisposable
     internal void TriggerAppEvent(AppEventMessage eventMessage) =>
         s_appEventMessageSubject.OnNext(eventMessage);
 
-    void IDisposable.Dispose() => _appEventSubscription.Dispose();        
+    void IDisposable.Dispose() => _appEventSubscription.Dispose();
 }
 
 /// <summary>
