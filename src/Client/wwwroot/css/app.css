@@ -126,3 +126,74 @@ app {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 10rem;
+    height: 10rem;
+    margin: 10vh auto 2rem auto;
+}
+
+    .loading-progress circle {
+        fill: none;
+        stroke: #e0e0e0;
+        stroke-width: 1rem;
+        transform-origin: 50% 50%;
+        transform: rotate(-90deg);
+    }
+
+        .loading-progress circle:last-child {
+            stroke: #ff4081ff;
+            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+            transition: stroke-dasharray 0.05s ease-in-out;
+        }
+
+.loading-progress-text {
+    margin: auto;
+    text-align: center;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 3rem;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+}
+
+    .loading-progress-text.top {
+        margin-top: 10vh;
+    }
+
+    .loading-progress-text.top:after {
+        content: var(--blazor-load-percentage-text);
+    }
+
+    .loading-progress-text.bottom:after {
+        content: "Loading...🤓";
+    }
+
+.min-vh-55 {
+    min-height: 55vh;
+}
+
+.min-vh-85 {
+    min-height: 85vh;
+}
+
+video {
+    height: auto;
+    max-width: 100%;
+    width: 100%;
+}
+
+.snacks {
+    font-size: 1.5rem;
+}
+
+.mud-link:hover {
+    filter: brightness(1.5);
+}
+
+.hidden {
+    display: none;
+}
+
+video.is-dominant

@@ -4,19 +4,33 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazor.LocalStorage.WebAssembly" Version="7.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="7.0.2" />
-    <PackageReference Include="MudBlazor" Version="6.1.7" />
+    <PackageReference Include="Blazor.LocalStorage.WebAssembly" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="7.0.3" />
+    <PackageReference Include="MudBlazor" Version="6.1.9" />
+    <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\Blazing.Twilio.Video.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\attachTrack.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\detachTrack.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\exitPictureInPicture.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\isFunctionDefined.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\isPictureInPictureSupported.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\registerParticipantEvents.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\requestPictureInPicture.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\subscribeToPublication.js" />
+    <WasmExtraFilesToDeploy Include="wwwroot\modules\waitForElement.js" />
   </ItemGroup>
 
 </Project>

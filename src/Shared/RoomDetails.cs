@@ -4,14 +4,20 @@
 namespace Blazing.Twilio.Video.Shared;
 
 /// <summary>
-/// 
+/// The representation of a rooms details.
 /// </summary>
-/// <param name="Id"></param>
-/// <param name="Name"></param>
-/// <param name="ParticipantCount"></param>
-/// <param name="MaxParticipants"></param>
+/// <param name="Id">The identifier for the room.</param>
+/// <param name="Name">The shared name of the room.</param>
+/// <param name="ParticipantCount">The number of participants in the room.</param>
+/// <param name="MaxParticipants">The maximum number of participants allowed in the room.</param>
 public readonly record struct RoomDetails(
     string? Id,
     string? Name,
     int ParticipantCount,
-    int MaxParticipants);
+    int MaxParticipants)
+{
+    /// <summary>
+    /// Gets a value indicating whether the room is full.
+    /// </summary>
+    public bool IsFull => ParticipantCount == MaxParticipants;
+}

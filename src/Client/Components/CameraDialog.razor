@@ -1,0 +1,46 @@
+﻿<MudDialog>
+    <DialogContent>
+        @switch (State)
+        {
+            case RequestCameraState.RequestingCameras:
+                <div class="d-flex">
+                    <MudText Typo="Typo.subtitle1" Class="flex-grow-1">Requesting client cameras...</MudText>
+                    <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+                </div>
+                break;
+            case RequestCameraState.FoundCameras:
+                if (CameraDevicesFound)
+                {
+                    <MudSelect T="string" Label="Camera" AdornmentColor="Color.Secondary"
+                       AutoFocus="true" Strict="true" Variant="Variant.Outlined"
+                       AnchorOrigin="Origin.BottomCenter" ReadOnly="IsRequesting"
+                       TextChanged="OnValueChanged"
+                       OpenIcon="@Icons.Material.Filled.PhotoCameraFront" @bind-Value="@_selectedCameraId">
+                        @foreach (var device in Devices!)
+                        {
+                            <MudSelectItem T="string" Value="@device.DeviceId">
+                                @device.Label
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudPaper Class="pa-4 mt-4" Elevation="4">
+                        <div id="camera-preview"></div>
+                    </MudPaper>
+                }
+                break;
+            default:
+                <MudTextField Value=@("Unable to load cameras") Label="Error"
+                      ReadOnly="true" Variant="Variant.Outlined" Error="true" />
+                break;
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Size="Size.Large"
+                   Variant="Variant.Filled">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Color="Color.Secondary" Size="Size.Large"
+                   Variant="Variant.Filled" OnClick="SaveCameraSelection">Select</MudButton>
+    </DialogActions>
+</MudDialog>

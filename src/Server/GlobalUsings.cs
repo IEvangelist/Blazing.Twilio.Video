@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 global using System.Security.Claims;
-global using Blazing.Twilio.Video.Server;
+global using Blazing.Twilio.Video.Server.Extensions;
 global using Blazing.Twilio.Video.Server.Hubs;
 global using Blazing.Twilio.Video.Server.Options;
 global using Blazing.Twilio.Video.Server.Services;

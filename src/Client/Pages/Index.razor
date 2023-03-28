@@ -1,61 +1,38 @@
 ﻿@page "/"
 
-<div class="row h-100 pt-5">
-    <div class="col-3">
-        <div class="jumbotron p-4">
-            <h5><i class="fas fa-video"></i> Rooms</h5>
-            <div class="list-group">
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="input-group">
-                        <input type="text" class="form-control form-control-lg"
-                               placeholder="Room name" aria-label="Room Name" disabled="@(ActiveCamera is null)"
-                               @bind="_roomName" @onkeydown="@(async args => await TryAddRoom(args))" />
-                        <div class="input-group-append">
-                            <button class="btn btn-lg twilio-btn-red"
-                                    disabled="@(ActiveCamera is null || _roomName is null)"
-                                    @onclick="@(async args => await TryAddRoom(args))">
-                                <i class="far fa-plus-square" aria-label="Create room"></i> Create
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                @if (!(_rooms?.Any() ?? false))
-                {
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <p class="lead mb-0">
-                            Add a room to begin. Other online participants can join or create rooms.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    @foreach (var room in _rooms!)
-                    {
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
-                           @(room.Name == _activeRoom ? "active" : null)"
-                           @onclick="@(async _ => await TryJoinRoom(room.Name))">
-                            @room.Name
-                            <span class="badge badge-primary badge-pill">
-                                @($"{room.ParticipantCount} / {room.MaxParticipants}")
-                            </span>
-                        </a>
-                    }
-                }
-
-                @if (_activeRoom != null)
-                {
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <button class="btn btn-lg twilio-btn-red w-100" @onclick="@(async _ => await OnLeaveRoom())">Leave Room?</button>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="col-9">
-        <div id="participants" class="participants-grid">
-            <div class="embed-responsive embed-responsive-16by9">
-                <div id="camera" class="embed-responsive-item"></div>
-            </div>
-        </div>
-    </div>
-</div>
+<MudGrid Justify="Justify.Center" Class="gap-4">
+    <MudItem xs="10" Class="@HeaderClass">
+        <MudPaper Elevation="10" Class="pa-4" Style="background-color: var(--mud-palette-dark)">
+            <MudGrid Justify="Justify.Center" Class="gap-4 align-content-center justify-center">
+                <MudItem xs="1" Class="d-flex pb-2">
+                    <MudLink Href="https://learn.microsoft.com/aspnet/core/blazor" Target="_blank" Class="d-flex">
+                        <MudImage Src="/images/blazor.svg" Alt="Blazor logo" Elevation="0"
+                                  Width="165" ObjectPosition="ObjectPosition.Center"
+                                  ObjectFit="ObjectFit.Contain" Class="pb-4 pr-4" />
+                    </MudLink>
+                </MudItem>
+                <MudItem xs="1" Class="d-flex">
+                    <MudIcon Icon="@Icons.Material.Filled.Favorite" Color="Color.Secondary"
+                             Size="Size.Large" Style="margin: auto" />
+                </MudItem>
+                <MudItem xs="1" Class="d-flex">
+                    <MudLink Href="https://www.twilio.com/docs/video" Target="_blank" Class="d-flex">
+                        <MudImage Src="/images/twilio.svg" Alt="Twilio logo" Elevation="0"
+                                  Width="100" ObjectPosition="ObjectPosition.Center"
+                                  ObjectFit="ObjectFit.Contain" />
+                    </MudLink>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="@ParticipantOneColumnSize" Class="@ParticipantOneClass">
+        <MudPaper Elevation="10" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
+            <div id="participant-1"></div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="@ParticipantTwoColumnSize" Class="@ParticipantTwoClass">
+        <MudPaper Elevation="10" Class="pa-4 align-content-center justify-center mud-width-full mud-height-full">
+            <div id="participant-2"></div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>

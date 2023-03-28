@@ -8,19 +8,19 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-    <!--<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>-->
-    <script src="https://sdk.twilio.com/js/video/releases/2.26.0/twilio-video.min.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js" async defer></script>
+    <script src="https://sdk.twilio.com/js/video/releases/2.26.2/twilio-video.min.js" async defer></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 </head>
 <body>
     <div id="app">
-        <div class="d-flex justify-content-center align-items-center w-100 p-4">
-            <h1 class="display-1 twilio-text">
-                <strong class="pr-4">Loading...</strong>
-                <span class="spinner-grow ml-auto" role="status" aria-hidden="true"></span>
-            </h1>
-        </div>
+        <div class="loading-progress-text top"></div>
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text bottom"></div>
     </div>
 
     <div id="blazor-error-ui">

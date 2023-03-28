@@ -1,9 +1,9 @@
-﻿// Copyright (c) David Pine. All rights reserved.
+// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
 namespace Blazing.Twilio.Video.Server.Services;
 
-public sealed class TwilioService
+internal sealed class TwilioService
 {
     readonly TwilioSettings _twilioSettings;
 
@@ -18,17 +18,24 @@ public sealed class TwilioService
             _twilioSettings.ApiSecret ?? "no-secret");
     }
 
-    public TwilioJwt GetTwilioJwt(string? identity) =>
-        new(Token: new Token(
+    public TwilioJwt GetTwilioJwt(string? identity)
+    {
+        var token = new Token(
             _twilioSettings.AccountSid,
             _twilioSettings.ApiKey,
             _twilioSettings.ApiSecret,
             identity ?? GetName(),
-            grants: new HashSet<IGrant> { new VideoGrant() }).ToJwt());
+            grants: new HashSet<IGrant> { new VideoGrant() });
+
+        return new(Token: token.ToJwt());
+    }
 
     public async ValueTask<IEnumerable<RoomDetails>> GetAllRoomsAsync()
     {
-        var rooms = await RoomResource.ReadAsync();
+        var rooms = await RoomResource.ReadAsync(new ReadRoomOptions
+        {
+            Status = RoomResource.RoomStatusEnum.InProgress
+        });
         var tasks = rooms.Select(
             room => GetRoomDetailsAsync(
                 room,
@@ -84,7 +91,7 @@ public sealed class TwilioService
     #endregion
 }
 
-static class StringArrayExtensions
+file static class StringArrayExtensions
 {
     internal static string RandomElement(this IReadOnlyList<string> array) =>
         array[Random.Shared.Next(array.Count)];

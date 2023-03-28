@@ -3,7 +3,7 @@
 
 namespace Blazing.Twilio.Video.Server.Options;
 
-public class TwilioSettings
+public sealed class TwilioSettings
 {
     /// <summary>
     /// The primary Twilio account SID, displayed prominently on your twilio.com/console dashboard.

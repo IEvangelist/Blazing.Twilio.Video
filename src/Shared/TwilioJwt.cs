@@ -4,7 +4,7 @@
 namespace Blazing.Twilio.Video.Shared;
 
 /// <summary>
-/// 
+/// The representation of a Twilio JWT.
 /// </summary>
-/// <param name="Token"></param>
+/// <param name="Token">The token value.</param>
 public readonly record struct TwilioJwt(string? Token);

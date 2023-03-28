@@ -4,10 +4,10 @@
 namespace Blazing.Twilio.Video.Shared;
 
 /// <summary>
-/// 
+/// A device as returned from the native browser.
 /// </summary>
-/// <param name="DeviceId"></param>
-/// <param name="Label"></param>
+/// <param name="DeviceId">The device identifier.</param>
+/// <param name="Label">The label (human readable name) of the device.</param>
 public readonly record struct Device(
     string DeviceId,
     string Label);

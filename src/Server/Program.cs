@@ -1,5 +1,7 @@
-// Copyright (c) David Pine. All rights reserved.
+﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
+
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,17 +34,40 @@ else
     app.UseHsts();
 }
 
-app.MapGroup("api/twilio").MapTwilioApi();
+app.MapTwilioApi();
 
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    HttpsCompression = HttpsCompressionMode.Compress,
-    OnPrepareResponse = context =>
-        context.Context.Response.Headers[HeaderNames.CacheControl] =
-            $"public,max-age={86_400}"
-});
+app.UseStaticFiles(app.Environment.IsDevelopment()
+    ? new()
+    : new StaticFileOptions
+    {
+        HttpsCompression = HttpsCompressionMode.Compress,
+        OnPrepareResponse = context =>
+        {
+            if (context.File.Exists is false)
+            {
+                var file = context.File;
+                if (file.PhysicalPath is not null)
+                {
+
+                }
+            }
+
+            context.Context.Response.Headers[HeaderNames.CacheControl] =
+                $"public,max-age={86_400}";
+        },
+        ContentTypeProvider = new FileExtensionContentTypeProvider
+        {
+            Mappings =
+            {
+                [".gz"] = "application/gzip",
+                [".css"] = "text/css",
+                [".html"] = "text/html",
+                [".js"] = "text/javascript"
+            }
+        }
+    });
 app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();

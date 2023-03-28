@@ -1,5 +1,12 @@
-// Copyright (c) David Pine. All rights reserved.
+﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
+
+if (!OperatingSystem.IsBrowser())
+{
+    throw new PlatformNotSupportedException("""
+        The Blazing Chat app only supports running in the browser!
+        """);
+}
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -10,8 +17,12 @@ builder.Services.AddScoped(_ =>
     {
         BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
     });
+builder.Services.AddSingleton<AppState>();
 builder.Services.AddLocalStorageServices();
-builder.Services.AddSingleton<ISiteVideoJavaScriptModule, SiteVideoJavaScriptModule>();
 builder.Services.AddMudServices();
 
-await builder.Build().RunAsync();
+await JSHost.ImportAsync(
+    moduleName: nameof(SiteJavaScriptModule), moduleUrl: $"../js/blazing-video.js?{Guid.NewGuid()}");
+
+var app = builder.Build();
+await app.RunAsync();
