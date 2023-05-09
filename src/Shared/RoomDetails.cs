@@ -4,7 +4,7 @@
 namespace Blazing.Twilio.Video.Shared;
 
 /// <summary>
-/// The representation of a rooms details.
+/// The representation of the details of a room.
 /// </summary>
 /// <param name="Id">The identifier for the room.</param>
 /// <param name="Name">The shared name of the room.</param>
