@@ -15,16 +15,15 @@ public sealed partial class Index
     bool HideHeader => ParticipantOneColumnSize is 10 || ParticipantTwoColumnSize is 10;
 
     /// <summary>The "#participant-1 > video" HTML element column size.</summary>
-    int ParticipantOneColumnSize => AppState switch
+    int ParticipantOneColumnSize => AppState.CameraStatus switch
     {
-        { CameraStatus: CameraStatus.PictureInPicture } => 0,
-        {
-            CameraStatus:
-                CameraStatus.Idle or
-                CameraStatus.InCall or
-                CameraStatus.RequestingPreview or
-                CameraStatus.Previewing
-        } => 5,
+        CameraStatus.PictureInPicture => 0,
+
+        CameraStatus.Idle or
+        CameraStatus.InCall or
+        CameraStatus.RequestingPreview or
+        CameraStatus.Previewing => 5,
+
         _ => 10
     };
 
@@ -37,16 +36,15 @@ public sealed partial class Index
     };
 
     /// <summary>The "#participant-2 > video" HTML element column size.</summary>
-    int ParticipantTwoColumnSize => AppState switch
+    int ParticipantTwoColumnSize => AppState.CameraStatus switch
     {
-        { CameraStatus: CameraStatus.PictureInPicture } => 10,
-        {
-            CameraStatus:
-                CameraStatus.Idle or
-                CameraStatus.InCall or
-                CameraStatus.RequestingPreview or
-                CameraStatus.Previewing
-        } => 5,
+        CameraStatus.PictureInPicture => 10,
+
+        CameraStatus.Idle or
+        CameraStatus.InCall or
+        CameraStatus.RequestingPreview or
+        CameraStatus.Previewing => 5,
+
         _ => 0
     };
 

@@ -1,9 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-
 namespace Blazing.Twilio.Video.Client.Services;
 
 public sealed class AppEventSubject : IDisposable

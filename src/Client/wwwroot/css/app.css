@@ -196,4 +196,30 @@ video {
     display: none;
 }
 
-video.is-dominant
+div#participant-2[is-pip]:empty::after {
+    content: 'Someone will join shortly';
+    font-size: 3rem;
+    text-align: center;
+    position: fixed;
+    left: calc((10 / 12) * 45%);
+    top: calc(50% - 1.5rem);
+    animation: ellipsis-animation 3s infinite;
+}
+
+@keyframes ellipsis-animation {
+    0% {
+        content: "Someone will join shortly";
+    }
+
+    25% {
+        content: "Someone will join shortly.";
+    }
+
+    50% {
+        content: "Someone will join shortly..";
+    }
+
+    75% {
+        content: "Someone will join shortly...";
+    }
+}

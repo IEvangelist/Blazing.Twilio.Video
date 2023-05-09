@@ -15,12 +15,12 @@ public sealed partial class Index
     {
         if (firstRender is false && AppState.SelectedCameraId is { } deviceId)
         {
-            if (AppState is
+            if (AppState.CameraStatus switch
                 {
-                    CameraStatus:
-                        CameraStatus.PictureInPicture or
-                        CameraStatus.InCall or
-                        CameraStatus.Previewing
+                    CameraStatus.PictureInPicture or
+                    CameraStatus.InCall or
+                    CameraStatus.Previewing => true,
+                    _ => false
                 })
             {
                 return;

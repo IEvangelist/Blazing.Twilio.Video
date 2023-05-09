@@ -1,8 +1,6 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
-using Blazing.Twilio.Video.Shared;
-
 namespace Blazing.Twilio.Video.Client.Shared;
 
 public sealed partial class MainLayout : IDisposable
@@ -15,7 +13,7 @@ public sealed partial class MainLayout : IDisposable
     [Inject] public required ILogger<MainLayout> Logger { get; set; }
 
     string LeaveRoomQuestion => $"""
-        Leave "{AppState.ActiveRoomName}" Room?
+        Leave "{AppState.ActiveRoomName ?? "Unknown"}" Room?
         """;
 
     readonly AppEventSubject _appEvents;
@@ -72,19 +70,20 @@ public sealed partial class MainLayout : IDisposable
 
     void IDisposable.Dispose() => AppState.StateChanged -= OnStateHasChanged;
 
-    async Task OnPictureInPictureChanged(bool toggleOn)
+    async Task OnPictureInPictureChanged(bool isToggleOn)
     {
-        if (toggleOn)
+        if (isToggleOn)
         {
             await SiteJavaScriptModule.RequestPictureInPictureAsync(
                 selector: ElementSelectors.ParticipantOneId.AsVideoSelector(),
-                isPiP =>
+                isPictureInPicture =>
                 {
-                    if (isPiP)
+                    if (isPictureInPicture)
                     {
                         AppState.CameraStatus = CameraStatus.PictureInPicture;
                     }
-                    Logger.LogInformation("Entered PiP: {Value}", isPiP);
+
+                    Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
                 },
                 onExited: () => AppState.CameraStatus = AppState.PreviousCameraStatus);
         }
@@ -96,7 +95,7 @@ public sealed partial class MainLayout : IDisposable
             }
             else
             {
-                Logger.LogWarning("☹️ Unable to exit picture-in-picture mode.");
+                Logger.LogWarning("😶 Unable to exit picture-in-picture mode.");
             }
         });
     }
@@ -109,14 +108,14 @@ public sealed partial class MainLayout : IDisposable
                 "⚡ App event message: {Type} (Payload: {Value})",
                 eventMessage.MessageType, eventMessage.Value);
 
-            if (eventMessage.MessageType is MessageType.LeaveRoom)
+            if (eventMessage is { MessageType: MessageType.LeaveRoom })
             {
                 TryLeaveRoom();
                 return;
             }
 
             if (_hubConnection is not null &&
-                eventMessage.MessageType is MessageType.CreateOrJoinRoom)
+                eventMessage is { MessageType: MessageType.CreateOrJoinRoom })
             {
                 if (await SiteJavaScriptModule.CreateOrJoinRoomAsync(
                     eventMessage.Value, eventMessage.TwilioToken!))
@@ -129,6 +128,7 @@ public sealed partial class MainLayout : IDisposable
                             {
                                 AppState.CameraStatus = CameraStatus.PictureInPicture;
                             }
+
                             Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
                         },
                         onExited: () => AppState.CameraStatus = CameraStatus.InCall);
@@ -139,15 +139,15 @@ public sealed partial class MainLayout : IDisposable
                 }
             }
 
-            if (eventMessage.MessageType is MessageType.SelectCamera &&
+            if (eventMessage is { MessageType: MessageType.SelectCamera } &&
                 AppState.SelectedCameraId is { } deviceId)
             {
-                if (AppState is
+                if (AppState.CameraStatus switch
                     {
-                        CameraStatus:
-                            CameraStatus.PictureInPicture or
-                            CameraStatus.InCall or
-                            CameraStatus.Previewing
+                        CameraStatus.PictureInPicture or
+                        CameraStatus.InCall or
+                        CameraStatus.Previewing => true,
+                        _ => false
                     })
                 {
                     return;
@@ -171,11 +171,11 @@ public sealed partial class MainLayout : IDisposable
             AppState.Rooms = await Http.GetFromJsonAsync<HashSet<RoomDetails>>("api/twilio/rooms")
                 ?? new();
 
-            const string template = LogMessageTemplates.OnRoomAdded;
+            Logger.LogInformation(LogMessageTemplates.OnRoomAdded, roomName);
 
-            Logger.LogInformation(template, roomName);
             Snackbar.Add(
-                template.Replace("{RoomName}", roomName),
+                LogMessageTemplates.OnRoomAdded.Replace(
+                    "{RoomName}", roomName),
                 Severity.Error,
                 options =>
                 {
@@ -187,11 +187,11 @@ public sealed partial class MainLayout : IDisposable
     Task OnUserConnected(string message) =>
         InvokeAsync(() =>
         {
-            const string template = LogMessageTemplates.OnUserConnected;
+            Logger.LogInformation(LogMessageTemplates.OnUserConnected, message);
 
-            Logger.LogInformation(template, message);
             Snackbar.Add(
-                template.Replace("{Message}", message),
+                LogMessageTemplates.OnUserConnected.Replace(
+                    "{Message}", message),
                 Severity.Error,
                 options =>
                 {

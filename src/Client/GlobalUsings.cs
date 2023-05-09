@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 global using System.Net.Http.Json;
+global using System.Reactive.Linq;
+global using System.Reactive.Subjects;
 global using System.Runtime.InteropServices.JavaScript;
 global using Blazing.Twilio.Video.Client;
 global using Blazing.Twilio.Video.Client.Components;
