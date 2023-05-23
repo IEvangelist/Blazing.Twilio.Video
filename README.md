@@ -14,8 +14,3 @@
 ## Room created (user 1)
 ![room created](images/room-created.png)
 
-## Join room (user 2)
-![app start](images/party.png)
-
-## Party ensues (user 1)
-![app start](images/party-0.png)
