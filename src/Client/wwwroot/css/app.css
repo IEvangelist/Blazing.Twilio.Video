@@ -4,37 +4,6 @@
     --twilio-blue: #0D122B;
 }
 
-.twilio-text {
-    color: var(--twilio-red);
-}
-
-a.list-group-item.list-group-item-action.active {
-    background-color: var(--twilio-blue);
-    border-color: var(--twilio-blue);
-}
-
-.twilio-btn-red {
-    background-color: var(--twilio-red);
-    border-color: var(--twilio-red);
-    color: #fff;
-}
-
-    .twilio-btn-red:not(:disabled):hover {
-        background-color: #D31027;
-        border-color: #D31027;
-    }
-
-.twilio-btn-blue {
-    background-color: var(--twilio-blue);
-    border-color: var(--twilio-blue);
-    color: #fff;
-}
-
-    .twilio-btn-blue:not(:disabled):hover {
-        background-color: #00000C;
-        border-color: #00000C;
-    }
-
 input:disabled, .btn:disabled {
     border-color: #444;
     cursor: not-allowed;
@@ -44,32 +13,6 @@ audio {
     display: none;
 }
 
-.participants-grid {
-    display: grid;
-    grid-gap: 5px;
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: 1fr 1fr;
-}
-
-    .participants-grid > div:nth-of-type(1) {
-        grid-row: 1;
-        grid-column: 1;
-    }
-
-    .participants-grid > div:nth-of-type(2) {
-        grid-row: 1;
-        grid-column: 2;
-    }
-
-    .participants-grid > div:nth-of-type(3) {
-        grid-row: 2;
-        grid-column: 1;
-    }
-
-    .participants-grid > div:nth-of-type(4) {
-        grid-row: 2;
-        grid-column: 2;
-    }
 
 app {
     position: relative;
@@ -192,9 +135,14 @@ video {
     filter: brightness(1.5);
 }
 
-.hidden {
-    display: none;
-}
+    .mud-link:hover > img {
+        transition: all ease-in-out .3s;
+        transform: scale(1.1);
+    }
+
+    .hidden {
+        display: none;
+    }
 
 div#participant-2[is-pip]:empty::after {
     content: 'Someone will join shortly';
@@ -221,5 +169,37 @@ div#participant-2[is-pip]:empty::after {
 
     75% {
         content: "Someone will join shortly...";
+    }
+}
+
+.heart-svg {
+    margin: auto;
+    font-size: 6rem !important;
+    animation: heart-beat 1.2s infinite;
+}
+
+@keyframes heart-beat {
+    0% {
+        transform: scale(0.8);
+    }
+
+    5% {
+        transform: scale(0.9);
+    }
+
+    10% {
+        transform: scale(0.8);
+    }
+
+    15% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.8);
+    }
+
+    100% {
+        transform: scale(0.8);
     }
 }
