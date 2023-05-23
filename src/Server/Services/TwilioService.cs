@@ -30,26 +30,28 @@ internal sealed class TwilioService
         return new(Token: token.ToJwt());
     }
 
-    public async ValueTask<IEnumerable<RoomDetails>> GetAllRoomsAsync()
+    public async IAsyncEnumerable<RoomDetails> GetAllRoomsAsync()
     {
         var rooms = await RoomResource.ReadAsync(new ReadRoomOptions
         {
             Status = RoomResource.RoomStatusEnum.InProgress
         });
-        var tasks = rooms.Select(
-            room => GetRoomDetailsAsync(
-                room,
-                ParticipantResource.ReadAsync(
-                    room.Sid,
-                    ParticipantStatus.Connected)));
 
-        return await Task.WhenAll(tasks);
+        foreach (var room in rooms)
+        {
+            var participantsTask = ParticipantResource.ReadAsync(
+                room.Sid,
+                ParticipantStatus.Connected);
+
+            yield return await GetRoomDetailsAsync(room, participantsTask);
+        }
 
         static async Task<RoomDetails> GetRoomDetailsAsync(
             RoomResource room,
-            Task<ResourceSet<ParticipantResource>> participantTask)
+            Task<ResourceSet<ParticipantResource>> participantsTask)
         {
-            var participants = await participantTask;
+            var participants = await participantsTask;
+
             return new RoomDetails(
                 room.Sid,
                 room.UniqueName,

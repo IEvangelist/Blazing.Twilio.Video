@@ -32,7 +32,7 @@ public sealed class AppState
 
     /// <summary>
     /// Gets or sets the selected camera device identifier.
-    /// Persisted to <c>window.localStorage["camera-device-id"]</c>
+    /// Persisted to <c>window.localStorage["<see cref="StorageKeys.CameraDeviceId"/>"]</c>
     /// </summary>
     public string? SelectedCameraId
     {
@@ -87,7 +87,7 @@ public sealed class AppState
 
     /// <summary>
     /// Gets or sets whether dark-theme is preferred.
-    /// Persisted to <c>window.localStorage["prefers-dark-theme"]</c>
+    /// Persisted to <c>window.localStorage["<see cref="StorageKeys.PrefersDarkTheme"/>"]</c>
     /// </summary>
     public bool IsDarkTheme
     {
