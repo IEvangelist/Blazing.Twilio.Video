@@ -15,5 +15,5 @@ public sealed class NotificationHub : Hub
     /// <inheritdoc cref="Hub.OnConnectedAsync" />
     public override Task OnConnectedAsync() =>
         Clients.All.SendAsync(HubEventNames.UserConnected,
-            "Welcome to Blazing Video Chat (Powered by Twilio)");
+            "Add new user is visiting the Blazing Video Chat (Powered by Twilio) app");
 }

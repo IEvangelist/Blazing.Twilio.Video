@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Client.Models;
+
 namespace Blazing.Twilio.Video.Client.Shared;
 
 public sealed partial class MainLayout : IDisposable
@@ -11,9 +13,16 @@ public sealed partial class MainLayout : IDisposable
     [Inject] public required IDialogService Dialog { get; set; }
     [Inject] public required ISnackbar Snackbar { get; set; }
     [Inject] public required ILogger<MainLayout> Logger { get; set; }
+    [Inject] public required ILocalStorageService LocalStorage { get; set; }
+    [Inject] public required IJSInProcessRuntime JavaScript { get; set; }
+    [Inject] public required NavigationManager Navigation { get; set; }
 
     string LeaveRoomQuestion => $"""
         Leave "{AppState.ActiveRoomName ?? "Unknown"}" Room?
+        """;
+
+    string ShareRoomQuestion => $"""
+        Share "{AppState.ActiveRoomName ?? "Unknown"}" Room?
         """;
 
     readonly AppEventSubject _appEvents;
@@ -55,6 +64,7 @@ public sealed partial class MainLayout : IDisposable
                         options =>
                         {
                             options.CloseAfterNavigation = true;
+                            options.SnackbarVariant = Variant.Filled;
                             options.IconSize = Size.Large;
                         });
                 }
@@ -63,6 +73,42 @@ public sealed partial class MainLayout : IDisposable
                     Logger.LogWarning("Unable to exit PiP mode.");
                 }
             });
+        }
+    }
+
+    async Task TryShareRoomAsync()
+    {
+        var roomName = AppState.ActiveRoomName;
+        var currentUri = new Uri(Navigation.Uri);
+        var uri = new Uri(currentUri, $"/{roomName}");
+
+        try
+        {
+            // Copy to client browser's clipboard.
+            await JavaScript.InvokeVoidAsync
+                ("navigator.clipboard.writeText", uri.ToString());
+
+            Snackbar.Add(
+                $"""Copied "{uri}" (room URL) to clipboard.""",
+                Severity.Success,
+                options =>
+                {
+                    options.CloseAfterNavigation = true;
+                    options.SnackbarVariant = Variant.Filled;
+                    options.IconSize = Size.Large;
+                });
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(
+                $"""Tried copying "{uri}" to clipboard, but failed: {ex}""",
+                Severity.Error,
+                options =>
+                {
+                    options.CloseAfterNavigation = true;
+                    options.SnackbarVariant = Variant.Filled;
+                    options.IconSize = Size.Large;
+                });
         }
     }
 
@@ -115,40 +161,41 @@ public sealed partial class MainLayout : IDisposable
             }
 
             if (_hubConnection is not null &&
-                eventMessage is { MessageType: MessageType.CreateOrJoinRoom })
+                eventMessage is { MessageType: MessageType.CreateOrJoinRoom } &&
+                eventMessage.TwilioToken is { } requestToken &&
+                    await SiteJavaScriptModule.CreateOrJoinRoomAsync(
+                        eventMessage.Value, requestToken))
             {
-                if (await SiteJavaScriptModule.CreateOrJoinRoomAsync(
-                    eventMessage.Value, eventMessage.TwilioToken!))
-                {
-                    await SiteJavaScriptModule.RequestPictureInPictureAsync(
-                        selector: ElementSelectors.ParticipantOneId.AsVideoSelector(),
-                        isPictureInPicture =>
+                TrySetShortLivedRequestToken(requestToken);
+
+                await SiteJavaScriptModule.RequestPictureInPictureAsync(
+                    selector: ElementSelectors.ParticipantOneId.AsVideoSelector(),
+                    isPictureInPicture =>
+                    {
+                        if (isPictureInPicture)
                         {
-                            if (isPictureInPicture)
-                            {
-                                AppState.CameraStatus = CameraStatus.PictureInPicture;
-                            }
+                            AppState.CameraStatus = CameraStatus.PictureInPicture;
+                        }
 
-                            Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
-                        },
-                        onExited: () => AppState.CameraStatus = CameraStatus.InCall);
+                        Logger.LogInformation("Entered PiP: {Value}", isPictureInPicture);
+                    },
+                    onExited: () => AppState.CameraStatus = CameraStatus.InCall);
 
-                    await _hubConnection.InvokeAsync(
-                        HubEventNames.RoomsUpdated,
-                        AppState.ActiveRoomName = eventMessage.Value);
-                }
+                await _hubConnection.InvokeAsync(
+                    HubEventNames.RoomsUpdated,
+                    AppState.ActiveRoomName = eventMessage.Value);
             }
 
             if (eventMessage is { MessageType: MessageType.SelectCamera } &&
                 AppState.SelectedCameraId is { } deviceId)
             {
                 if (AppState.CameraStatus switch
-                    {
-                        CameraStatus.PictureInPicture or
-                        CameraStatus.InCall or
-                        CameraStatus.Previewing => true,
-                        _ => false
-                    })
+                {
+                    CameraStatus.PictureInPicture or
+                    CameraStatus.InCall or
+                    CameraStatus.Previewing => true,
+                    _ => false
+                })
                 {
                     return;
                 }
@@ -163,6 +210,18 @@ public sealed partial class MainLayout : IDisposable
                 }
             }
         });
+    }
+
+    void TrySetShortLivedRequestToken(string requestToken)
+    {
+        if (LocalStorage.GetItem<ShortLivedRequestToken>(
+            StorageKeys.ShortLivedRequestToken) is { IsExpired: true })
+        {
+            LocalStorage.SetItem(
+                StorageKeys.ShortLivedRequestToken,
+                new ShortLivedRequestToken(
+                    Expiry: DateTime.Now.AddMinutes(55), TwilioToken: requestToken));
+        }
     }
 
     Task OnRoomAdded(string roomName) =>

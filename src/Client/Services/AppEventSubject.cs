@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Client.Models;
+
 namespace Blazing.Twilio.Video.Client.Services;
 
 public sealed class AppEventSubject : IDisposable
@@ -23,26 +25,3 @@ public sealed class AppEventSubject : IDisposable
 
     void IDisposable.Dispose() => _appEventSubscription.Dispose();
 }
-
-/// <summary>
-/// An event message for the app.
-/// </summary>
-/// <param name="Value">The value of the message.</param>
-/// <param name="MessageType">The type of the message.</param>
-/// <param name="TwilioToken">The Twilio Token (JWT).</param>
-public readonly record struct AppEventMessage(
-    string Value,
-    MessageType MessageType,
-    string? TwilioToken = default);
-
-public enum MessageType
-{
-    /// <summary> The user is selecting a camera.</summary>
-    SelectCamera,
-
-    /// <summary>The user is creating or joining a room.</summary>
-    CreateOrJoinRoom,
-
-    /// <summary>The user is leaving the room.</summary>
-    LeaveRoom
-};

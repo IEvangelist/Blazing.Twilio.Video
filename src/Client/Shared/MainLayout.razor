@@ -27,12 +27,20 @@
         <MudSpacer />
         @if (AppState.ActiveRoomName is not null)
         {
-            <MudButton Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.ArrowBack"
-                   Color="Color.Primary" IconColor="Color.Secondary"
-                   Size="Size.Large" title="@(LeaveRoomQuestion)"
-                   Style="font-size: 1.1rem;" OnClick="@TryLeaveRoom">
+            <MudButton Variant="Variant.Filled" Class="pr-4"
+                StartIcon="@Icons.Material.Filled.ArrowBack"
+                Color="Color.Primary" IconColor="Color.Secondary"
+                Size="Size.Large" title="@(LeaveRoomQuestion)"
+                Style="font-size: 1.1rem;" OnClick="@TryLeaveRoom">
                 @(LeaveRoomQuestion)
+            </MudButton>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" Class="pr-4"
+                StartIcon="@Icons.Material.Filled.ContentCopy"
+                Color="Color.Primary" IconColor="Color.Secondary"
+                Size="Size.Large" title="@(ShareRoomQuestion)"
+                Style="font-size: 1.1rem;" OnClick="@TryShareRoomAsync">
+                @(ShareRoomQuestion)
             </MudButton>
         }
         <MudSpacer />

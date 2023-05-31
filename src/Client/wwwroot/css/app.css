@@ -145,7 +145,7 @@ video {
     }
 
 div#participant-2[is-pip]:empty::after {
-    content: 'Someone will join shortly';
+    content: 'Participants will join you here';
     font-size: 3rem;
     text-align: center;
     position: fixed;
@@ -156,19 +156,19 @@ div#participant-2[is-pip]:empty::after {
 
 @keyframes ellipsis-animation {
     0% {
-        content: "Someone will join shortly";
+        content: "Participants will join you here";
     }
 
     25% {
-        content: "Someone will join shortly.";
+        content: "Participants will join you here.";
     }
 
     50% {
-        content: "Someone will join shortly..";
+        content: "Participants will join you here..";
     }
 
     75% {
-        content: "Someone will join shortly...";
+        content: "Participants will join you here...";
     }
 }
 

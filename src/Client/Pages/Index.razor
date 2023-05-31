@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/{roomName?}"
 
 <MudGrid Justify="Justify.Center" Class="gap-4">
     <MudItem xs="10" Class="@HeaderClass">
@@ -12,8 +12,10 @@
                     </MudLink>
                 </MudItem>
                 <MudItem xs="1" Class="d-flex">
-                    <MudIcon Icon="@Icons.Material.Filled.Favorite" Color="Color.Secondary"
-                             Size="Size.Large" Class="heart-svg" />
+                    <MudTooltip Text="Yes, Blazor loves Twilio... 💜!">
+                        <MudIcon Icon="@Icons.Material.Filled.Favorite" Color="Color.Secondary"
+                                 Size="Size.Large" Class="heart-svg" />
+                    </MudTooltip>
                 </MudItem>
                 <MudItem xs="1" Class="d-flex">
                     <MudLink Href="https://www.twilio.com/docs/video" Target="_blank" Class="d-flex">

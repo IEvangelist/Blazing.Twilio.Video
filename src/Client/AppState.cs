@@ -1,6 +1,8 @@
 ﻿// Copyright (c) David Pine. All rights reserved.
 // Licensed under the MIT License.
 
+using Blazing.Twilio.Video.Client.Models;
+
 namespace Blazing.Twilio.Video.Client;
 
 /// <summary>
@@ -16,6 +18,7 @@ public sealed class AppState
     string? _activeRoomName;
     HashSet<RoomDetails>? _rooms;
     CameraStatus _cameraStatus;
+    ShortLivedRequestToken? _shortLivedRequestToken;
 
     /// <summary>
     /// An event that is fired when the app state has changed.
@@ -106,6 +109,26 @@ public sealed class AppState
         }
     }
 
+    public ShortLivedRequestToken? ShortLivedRequestToken
+    {
+        get => _shortLivedRequestToken;
+        set
+        {
+            if (_shortLivedRequestToken != value)
+            {
+                _logger.LogInformation(
+                    "⚙️ Changed: AppState.ShortLivedRequestToken = {Value} (Was: {OldValue})",
+                    value, _shortLivedRequestToken);
+
+                _storage.SetItem(
+                    StorageKeys.ShortLivedRequestToken,
+                    _shortLivedRequestToken = value);
+
+                StateChanged?.Invoke();
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets the name of the active room.
     /// Not persisted to <c>window.localStorage</c>.
@@ -141,10 +164,4 @@ public sealed class AppState
             StateChanged?.Invoke();
         }
     }
-}
-
-file sealed class StorageKeys
-{
-    internal const string PrefersDarkTheme = "prefers-dark-theme";
-    internal const string CameraDeviceId = "camera-device-id";
 }
