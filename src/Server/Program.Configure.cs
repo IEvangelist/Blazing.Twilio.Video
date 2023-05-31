@@ -27,21 +27,10 @@ public static partial class Program
             ? new()
             : new StaticFileOptions
             {
-                HttpsCompression = HttpsCompressionMode.Compress,
                 OnPrepareResponse = context =>
                 {
                     context.Context.Response.Headers[HeaderNames.CacheControl] =
                         $"public,max-age={86_400}";
-                },
-                ContentTypeProvider = new FileExtensionContentTypeProvider
-                {
-                    Mappings =
-                    {
-                        [".gz"] = "application/gzip",
-                        [".css"] = "text/css",
-                        [".html"] = "text/html",
-                        [".js"] = "text/javascript"
-                    }
                 }
             });
         app.UseRouting();

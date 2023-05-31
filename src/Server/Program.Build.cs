@@ -8,11 +8,15 @@ public static partial class Program
         builder.Services
             .AddSignalR(options => options.EnableDetailedErrors = true)
             .AddMessagePackProtocol();
+
         builder.Services
             .Configure<TwilioSettings>(
-            builder.Configuration.GetSection(nameof(TwilioSettings)));
+                builder.Configuration.GetSection(nameof(TwilioSettings)));
+
         builder.Services.AddSingleton<TwilioService>();
+
         builder.Services.AddRazorPages();
+
         builder.Services
             .AddResponseCompression(opts =>
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

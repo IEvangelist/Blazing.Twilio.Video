@@ -7,4 +7,4 @@ using var app = builder.BuildApp();
 
 app.ConfigureApp();
 
-app.Run();
+await app.RunAsync();
