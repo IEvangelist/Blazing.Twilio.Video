@@ -11,6 +11,13 @@
 ## Participant (user 2)
 ![another user](images/participant.png)
 
-## Room created (user 1)
-![room created](images/room-created.png)
+## Create room (user 1)
+![create room](images/create-room.png)
+
+## Create room with emoji (user 1)
+![create room](images/create-room-with-emoji.png)
+
+## Share room (user 1)
+![share-room](images/share-room.png)
+
 
