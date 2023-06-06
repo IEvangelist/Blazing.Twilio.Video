@@ -86,12 +86,4 @@ internal sealed partial class SiteJavaScriptModule
     [JSImport("exitPictureInPicture", nameof(SiteJavaScriptModule))]
     public static partial Task ExitPictureInPictureAsync(
         [JSMarshalAs<JSType.Function<JSType.Boolean>>] Action<bool> onExited);
-
-    /// <summary>
-    /// Calls the client browser's <c>navigator.clipboard.writeText</c> function, saving
-    /// the given <paramref name="text"/> value to the clipboard.
-    /// </summary>
-    /// <param name="text">The text value to copy to the client's clipboard.</param>
-    [JSImport("navigator.clipboard.writeText", nameof(SiteJavaScriptModule))]
-    public static partial Task CopyToClipboardAsync(string text);
 }

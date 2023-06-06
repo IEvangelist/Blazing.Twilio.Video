@@ -4,7 +4,7 @@
 namespace Blazing.Twilio.Video.Shared;
 
 /// <summary>
-/// A device as returned from the native browser.
+/// A representation of a native browser device object.
 /// </summary>
 /// <param name="DeviceId">The device identifier.</param>
 /// <param name="Label">The label (human readable name) of the device.</param>

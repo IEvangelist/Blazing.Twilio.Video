@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
-using Blazing.Twilio.Video.Client.Models;
 using Blazor.Serialization.Extensions;
 
 namespace Blazing.Twilio.Video.Client.Components;
